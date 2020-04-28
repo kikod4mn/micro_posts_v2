@@ -2,13 +2,14 @@
 
 namespace App\Entity;
 
+use App\Entity\Abstracts\AbstractEntity;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserProfileRepository")
  */
-class UserProfile
+class UserProfile extends AbstractEntity
 {
 	/**
 	 * @ORM\Id()
@@ -101,7 +102,7 @@ class UserProfile
 	 */
 	public function setBio(string $bio): self
 	{
-		$this->bio = $bio;
+		$this->bio = $this->cleanString($bio);
 		
 		return $this;
 	}

@@ -114,32 +114,27 @@ class Post extends AbstractEntity implements CountableLikes, CountableViews, Tim
 	
 	/**
 	 * @param  string  $body
+	 * @return Post
 	 */
-	public function setBody(string $body): void
+	public function setBody(string $body): self
 	{
-		$this->body = $body;
+		$this->body = $this->cleanString($body);
+		
+		return $this;
 	}
 	
 	/**
-	 * @return Collection
+	 * @return null|Collection
 	 */
-	public function getComments()
+	public function getComments(): ?Collection
 	{
 		return $this->comments;
 	}
 	
 	/**
-	 * @param  Comment  $comment
+	 * @return null|Collection
 	 */
-	public function addComment(Comment $comment): void
-	{
-		$this->comments->add($comment);
-	}
-	
-	/**
-	 * @return Collection
-	 */
-	public function getLikedBy()
+	public function getLikedBy(): ?Collection
 	{
 		return $this->likedBy;
 	}

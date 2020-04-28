@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserPreferencesRepository")
@@ -23,7 +24,8 @@ class UserPreferences
 	protected $user;
 	
 	/**
-	 * @ORM\Column(type="string", length=8)
+	 * @ORM\Column(type="string", length=4)
+	 * @Assert\Length(min="2", max="2")
 	 */
 	protected $locale;
 	

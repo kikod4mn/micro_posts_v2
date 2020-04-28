@@ -9,7 +9,12 @@ use App\Support\Concerns\HasAttributes;
 use App\Support\Contracts\Arrayable;
 use App\Support\Contracts\Jsonable;
 use App\Support\Contracts\Stringable;
+use Crudle\Profanity\Dictionary\GB;
+use Crudle\Profanity\Dictionary\US;
+use Crudle\Profanity\Filter;
 use Doctrine\ORM\EntityManagerInterface;
+use HTMLPurifier;
+use HTMLPurifier_Config;
 use InvalidArgumentException;
 use JsonSerializable;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -153,5 +158,90 @@ abstract class AbstractEntity implements Arrayable, Jsonable, JsonSerializable, 
 	{
 		$this->em->remove($this);
 		$this->em->flush();
+	}
+	
+	/**
+	 * Clean the string from html and profanities. No validation, just cleaning.
+	 * @param  string  $text
+	 * @return string
+	 */
+	protected function cleanString(string $text): string
+	{
+		return $this->filterHTML(
+			$this->filterProfanities(
+				$text
+			)
+		);
+	}
+	
+	/**
+	 * Filter out HTML tags, allowed tags are kept.
+	 * @param  string  $text
+	 * @return string
+	 */
+	protected function filterHTML(string $text): string
+	{
+		return $this->htmlPurifier()->purify($text);
+	}
+	
+	/**
+	 * @return HTMLPurifier
+	 */
+	protected function htmlPurifier(): HTMLPurifier
+	{
+		$config = HTMLPurifier_Config::createDefault();
+		$config->set('HTML.Allowed', $this->allowedHtmlTags());
+		
+		return new HTMLPurifier($config);
+	}
+	
+	/**
+	 * Get the custom allowed tags with defaults or return just defaults.
+	 * @return string
+	 */
+	protected function allowedHtmlTags(): string
+	{
+		return defined('static::HTML_TAGS_ALLOWED')
+			? implode(',', static::HTML_TAGS_ALLOWED) . ',p,strong,i,a[href]'
+			: 'p,strong,i,a[href]';
+	}
+	
+	/**
+	 * Cleans the string of profanities. Does not validate, just cleans.
+	 * @param  string  $text
+	 * @return string
+	 */
+	protected function filterProfanities(string $text): string
+	{
+		foreach ($this->profanityDictionaries() as $dict) {
+			
+			$text = (new Filter($dict))->cleanse($text);
+		}
+		
+		return $text;
+	}
+	
+	/**
+	 * Determine if the string contains profanities. Only checks, does not cleanse.
+	 * @param  string  $text
+	 * @return bool
+	 */
+	protected function containsProfanities(string $text): bool
+	{
+		foreach ($this->profanityDictionaries() as $dict) {
+			
+			return (new Filter($dict))->isDirty($text);
+		}
+	}
+	
+	/**
+	 * Return custom filters together with defaults or just the defaults.
+	 * @return array
+	 */
+	protected function profanityDictionaries(): array
+	{
+		$defaults = [new GB(), new US()];
+		
+		return defined('static::PROFANITY_FILTERS') ? array_merge(static::PROFANITY_FILTERS, $defaults) : $defaults;
 	}
 }

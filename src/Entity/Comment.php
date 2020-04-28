@@ -132,7 +132,7 @@ class Comment extends AbstractEntity implements CountableViews, CountableLikes, 
 	 */
 	public function setBody(string $body): void
 	{
-		$this->body = $body;
+		$this->body = $this->cleanString($body);
 	}
 	
 	/**

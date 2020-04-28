@@ -250,7 +250,7 @@ class User extends AbstractEntity implements UserInterface, TimeStampable, Trash
 	 */
 	public function setUsername(string $username): self
 	{
-		$this->username = $username;
+		$this->username = $this->cleanString($username);
 		
 		return $this;
 	}
@@ -316,7 +316,7 @@ class User extends AbstractEntity implements UserInterface, TimeStampable, Trash
 	 */
 	public function setEmail(string $email): self
 	{
-		$this->email = $email;
+		$this->email = $this->cleanString($email);
 		
 		return $this;
 	}
@@ -335,7 +335,7 @@ class User extends AbstractEntity implements UserInterface, TimeStampable, Trash
 	 */
 	public function setFullname(string $fullname): self
 	{
-		$this->fullname = $fullname;
+		$this->fullname = $this->cleanString($fullname);
 		
 		return $this;
 	}
@@ -454,19 +454,6 @@ class User extends AbstractEntity implements UserInterface, TimeStampable, Trash
 	public function getNotifications(): ?Collection
 	{
 		return $this->notifications;
-	}
-	
-	/**
-	 * @param  Notification  $notification
-	 * @return User
-	 */
-	public function setNotification(Notification $notification): self
-	{
-		if (! $this->notifications->contains($notification)) {
-			$this->notifications->add($notification);
-		}
-		
-		return $this;
 	}
 	
 	/**
