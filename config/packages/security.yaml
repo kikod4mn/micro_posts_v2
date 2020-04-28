@@ -1,23 +1,45 @@
 security:
-    # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
+    encoders:
+        App\Entity\User:
+            algorithm: auto
     providers:
-        users_in_memory: { memory: null }
+        database_users:
+            entity: { class: App\Entity\User, property: username }
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
-            anonymous: lazy
-            provider: users_in_memory
-
-            # activate different ways to authenticate
-            # https://symfony.com/doc/current/security.html#firewalls-authentication
-
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
-
-    # Easy way to control access for large sections of your site
-    # Note: Only the *first* access control that matches will be used
+            guard:
+                authenticators:
+                    - App\Security\LoginFormAuthenticator
+            anonymous: true
+            pattern: ^/
+            user_checker: App\Security\UserChecker
+            form_login:
+                check_path: login
+                login_path: login
+                csrf_token_generator: security.csrf.token_manager
+                default_target_path: /
+                always_use_default_target_path: false
+                use_referer: true
+                target_path_parameter: _target_path
+                failure_path: login
+            logout:
+                path: logout
+                target: homepage
+            remember_me:
+                secret:   '%kernel.secret%'
+                lifetime: 604800
+                path:     /
+                token_provider: 'Symfony\Bridge\Doctrine\Security\RememberMe\DoctrineTokenProvider'
+    
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/admin, roles: [IS_AUTHENTICATED_FULLY, ROLE_ADMINISTRATOR] }
+    
+    role_hierarchy:
+        ROLE_USER: []
+        ROLE_MODERATOR: [ROLE_USER]
+        ROLE_ADMINISTRATOR: [ROLE_MODERATOR]
+        ROLE_SUPER_ADMINISTRATOR: [ROLE_ADMINISTRATOR]
