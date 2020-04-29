@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace App\Entity;
 
 use App\Entity\Abstracts\AbstractEntity;
@@ -31,7 +33,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @UniqueEntity(fields="uuid", message="How did this happen???? Uuid should be unique!!")
  * @ORM\Entity(repositoryClass="App\Repository\CommentRepository")
  */
-class Comment extends AbstractEntity implements CountableViews, CountableLikes, Authorable, TimeStampable, Publishable, Reportable, Uniqable, Sluggable
+class Comment extends AbstractEntity
+	implements CountableViews, CountableLikes, Authorable, TimeStampable, Publishable, Reportable, Uniqable, Sluggable
 {
 	use HasUuid, CountsLikes, CountsViews, HasAuthor, HasTimestamps, CanPublish, CanReport, HasSlug;
 	

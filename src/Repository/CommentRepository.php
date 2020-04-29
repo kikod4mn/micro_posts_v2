@@ -1,12 +1,12 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace App\Repository;
 
 use App\Entity\Comment;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\Query\Expr\Join;
-use Doctrine\ORM\QueryBuilder;
 
 /**
  * @method Comment|null find($id, $lockMode = null, $lockVersion = null)

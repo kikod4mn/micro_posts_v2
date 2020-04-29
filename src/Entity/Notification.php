@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace App\Entity;
 
 use App\Entity\Abstracts\AbstractEntity;
@@ -28,6 +30,7 @@ class Notification extends AbstractEntity implements Authorable, TimeStampable, 
 	use HasUuid, HasAuthor, HasTimestamps;
 	
 	/**
+	 * NOTE : In notification context, author means the user it is generated for.
 	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="notifications")
 	 * @ORM\JoinColumn(nullable=false)
 	 * @var Authorable

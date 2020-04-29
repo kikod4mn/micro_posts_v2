@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace App\Entity\Concerns;
 
 use App\Entity\Contracts\TimeStampable;
 use Carbon\Carbon;
 use DateTime;
 use DateTimeInterface;
-use Symfony\Component\Validator\Constraints\Time;
 
 trait HasTimestamps
 {

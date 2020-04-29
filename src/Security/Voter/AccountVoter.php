@@ -1,41 +1,68 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace App\Security\Voter;
 
+use App\Entity\User;
+use App\Security\Voter\Concerns\ChecksPermissions;
+use App\Security\Voter\Contracts\Actionable;
+use LogicException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class AccountVoter extends Voter
+class AccountVoter extends Voter implements Actionable
 {
-    protected function supports($attribute, $subject)
-    {
-        // replace with your own logic
-        // https://symfony.com/doc/current/security/voters.html
-        return in_array($attribute, ['POST_EDIT', 'POST_VIEW'])
-            && $subject instanceof \App\Entity\BlogPost;
-    }
-
-    protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
-    {
-        $user = $token->getUser();
-        // if the user is anonymous, do not grant access
-        if (!$user instanceof UserInterface) {
-            return false;
-        }
-
-        // ... (check conditions and return true to grant permission) ...
-        switch ($attribute) {
-            case 'POST_EDIT':
-                // logic to determine if the user can EDIT
-                // return true or false
-                break;
-            case 'POST_VIEW':
-                // logic to determine if the user can VIEW
-                // return true or false
-                break;
-        }
-
-        return false;
-    }
+	use ChecksPermissions;
+	
+	/**
+	 * @var Security
+	 */
+	private $security;
+	
+	/**
+	 * @var null|UserInterface|User
+	 */
+	private $user;
+	
+	/**
+	 * AccountVoter constructor.
+	 * @param  Security  $security
+	 */
+	public function __construct(Security $security)
+	{
+		$this->security = $security;
+		$this->user     = $security->getUser();
+	}
+	
+	/**
+	 * @param  string  $attribute
+	 * @param  mixed   $subject
+	 * @return bool
+	 */
+	protected function supports($attribute, $subject): bool
+	{
+		return in_array($attribute, [self::EDIT, self::VIEW, self::DELETE])
+			&& $subject instanceof User;
+	}
+	
+	/**
+	 * @param  string          $attribute
+	 * @param  User            $subject
+	 * @param  TokenInterface  $token
+	 * @return bool
+	 */
+	protected function voteOnAttribute($attribute, $subject, TokenInterface $token): bool
+	{
+		switch ($attribute) {
+			case self::VIEW:
+			case self::EDIT:
+			case self::DELETE:
+				return $this->isOwner($subject) || $this->isAdmin();
+		}
+		
+		throw new LogicException('This code should not be reached!');
+	}
 }

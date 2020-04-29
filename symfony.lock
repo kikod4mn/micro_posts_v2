@@ -8,6 +8,9 @@
     "crudleapps/profanity": {
         "version": "v1.0.1"
     },
+    "dg/bypass-finals": {
+        "version": "v1.1.2"
+    },
     "doctrine/annotations": {
         "version": "1.0",
         "recipe": {

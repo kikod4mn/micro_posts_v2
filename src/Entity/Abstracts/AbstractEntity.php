@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace App\Entity\Abstracts;
 
 use App\Entity\Concerns\CanNormalize;
 use App\Entity\Contracts\Normalizable;
 use App\Entity\Contracts\Trashable;
-use App\Support\Concerns\HasAttributes;
 use App\Support\Contracts\Arrayable;
 use App\Support\Contracts\Jsonable;
 use App\Support\Contracts\Stringable;
@@ -21,7 +22,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 abstract class AbstractEntity implements Arrayable, Jsonable, JsonSerializable, Stringable, Normalizable
 {
-	use HasAttributes, CanNormalize;
+	use CanNormalize;
 	
 	/**
 	 * Default name for created at timestamp field.
@@ -230,8 +231,13 @@ abstract class AbstractEntity implements Arrayable, Jsonable, JsonSerializable, 
 	{
 		foreach ($this->profanityDictionaries() as $dict) {
 			
-			return (new Filter($dict))->isDirty($text);
+			if ((new Filter($dict))->isDirty($text)) {
+				
+				return true;
+			}
 		}
+		
+		return false;
 	}
 	
 	/**

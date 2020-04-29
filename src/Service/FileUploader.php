@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace App\Service;
 
-use App\Kikopolis\Str;
+use App\Support\Str;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;

@@ -9,6 +9,7 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/clue/stream-filter" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/crudleapps/profanity" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/dg/bypass-finals" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/doctrine/annotations" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/doctrine/cache" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/doctrine/collections" />

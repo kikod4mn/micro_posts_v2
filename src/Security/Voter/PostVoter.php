@@ -4,8 +4,8 @@ declare(strict_types = 1);
 
 namespace App\Security\Voter;
 
+use App\Entity\Post;
 use App\Entity\User;
-use App\Entity\UserPreferences;
 use App\Security\Voter\Concerns\ChecksPermissions;
 use App\Security\Voter\Contracts\Actionable;
 use LogicException;
@@ -14,7 +14,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class PreferencesVoter extends Voter implements Actionable
+class PostVoter extends Voter implements Actionable
 {
 	use ChecksPermissions;
 	
@@ -46,19 +46,20 @@ class PreferencesVoter extends Voter implements Actionable
 	protected function supports($attribute, $subject): bool
 	{
 		return in_array($attribute, [self::EDIT, self::VIEW, self::DELETE])
-			&& $subject instanceof UserPreferences;
+			&& $subject instanceof Post;
 	}
 	
 	/**
-	 * @param  string           $attribute
-	 * @param  UserPreferences  $subject
-	 * @param  TokenInterface   $token
+	 * @param  string          $attribute
+	 * @param  Post            $subject
+	 * @param  TokenInterface  $token
 	 * @return bool
 	 */
 	protected function voteOnAttribute($attribute, $subject, TokenInterface $token): bool
 	{
 		switch ($attribute) {
 			case self::VIEW:
+				return ! $subject->isPublished() || $this->isOwner($subject) || $this->isAdmin();
 			case self::EDIT:
 			case self::DELETE:
 				return $this->isOwner($subject) || $this->isAdmin();

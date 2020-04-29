@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace App\Entity;
 
 use App\Entity\Abstracts\AbstractEntity;
@@ -34,7 +36,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @UniqueEntity(fields="uuid", message="How did this happen???? Uuid should be unique!!")
  * @ORM\Entity(repositoryClass="App\Repository\PostRepository")
  */
-class Post extends AbstractEntity implements CountableLikes, CountableViews, TimeStampable, Authorable, Publishable, Reportable, Trashable, Uniqable, Sluggable
+class Post extends AbstractEntity
+	implements CountableLikes, CountableViews, TimeStampable, Authorable, Publishable, Reportable, Trashable, Uniqable, Sluggable
 {
 	use HasUuid, CountsViews, CountsLikes, HasAuthor, HasTimestamps, CanPublish, CanReport, CanTrash, HasSlug;
 	

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace App\Model\Concerns;
 
 use App\Model\Doctrine\UuidEncoder;

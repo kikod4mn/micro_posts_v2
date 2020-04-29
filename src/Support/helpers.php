@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 /**
  * Modified helpers file from Laravel.
  * Laravel - A PHP Framework For Web Artisans

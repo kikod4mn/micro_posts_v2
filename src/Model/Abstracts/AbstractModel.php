@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace App\Model\Abstracts;
 
 use App\Entity\Contracts\Publishable;
 use App\Entity\Contracts\Trashable;
 use App\Model\Concerns\DecodesUuid;
+use App\Model\Concerns\WorksWithUuid;
 use App\Support\Concerns\WorksClassname;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
@@ -12,7 +15,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 abstract class AbstractModel
 {
-	use WorksClassname, DecodesUuid;
+	use WorksClassname, DecodesUuid, WorksWithUuid;
 	
 	/**
 	 * @var ServiceEntityRepository
@@ -92,6 +95,15 @@ abstract class AbstractModel
 	}
 	
 	/**
+	 * @param  int[]  $ids
+	 * @return mixed[]
+	 */
+	public function findMany(array $ids)
+	{
+		return $this->findBy(['id' => $ids]);
+	}
+	
+	/**
 	 * @param  array       $criteria
 	 * @param  null|array  $orderBy
 	 * @param  null|int    $limit
@@ -103,15 +115,6 @@ abstract class AbstractModel
 		return $this->filter(
 			$this->repository->findBy($criteria, $orderBy, $limit, $offset)
 		);
-	}
-	
-	/**
-	 * @param  array  $ids
-	 * @return mixed[]
-	 */
-	public function findMany(array $ids)
-	{
-		return $this->findBy(['id' => $ids]);
 	}
 	
 	/**
