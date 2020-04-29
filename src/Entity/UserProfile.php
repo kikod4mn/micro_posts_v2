@@ -3,20 +3,20 @@
 namespace App\Entity;
 
 use App\Entity\Abstracts\AbstractEntity;
+use App\Entity\Concerns\HasUuid;
+use App\Entity\Contracts\Uniqable;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
+ * @ORM\Table(name="`user_profile`")
+ * @UniqueEntity(fields="uuid", message="How did this happen???? Uuid should be unique!!")
  * @ORM\Entity(repositoryClass="App\Repository\UserProfileRepository")
  */
-class UserProfile extends AbstractEntity
+class UserProfile extends AbstractEntity implements Uniqable
 {
-	/**
-	 * @ORM\Id()
-	 * @ORM\GeneratedValue()
-	 * @ORM\Column(type="bigint")
-	 */
-	protected $id;
+	use HasUuid;
 	
 	/**
 	 * @ORM\OneToOne(targetEntity="User", mappedBy="profile")
@@ -41,14 +41,6 @@ class UserProfile extends AbstractEntity
 	 * @var DateTime
 	 */
 	protected $birthday;
-	
-	/**
-	 * @return null|int
-	 */
-	public function getId(): ?int
-	{
-		return $this->id;
-	}
 	
 	/**
 	 * @return User

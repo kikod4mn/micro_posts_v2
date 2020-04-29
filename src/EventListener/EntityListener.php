@@ -4,7 +4,9 @@ namespace App\EventListener;
 
 use App\Entity\Abstracts\AbstractEntity;
 use App\Entity\Contracts\Authorable;
+use App\Entity\Contracts\CountableViews;
 use App\Entity\Contracts\TimeStampable;
+use App\Entity\Contracts\Uniqable;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Symfony\Component\Security\Core\Security;
 
@@ -33,35 +35,35 @@ class EntityListener
 	{
 		$entity = $args->getEntity();
 		
-		if (!$entity instanceof TimeStampable) {
+		// For generating a uuid for the entity.
+		if ($entity instanceof Uniqable) {
 			
-			return;
+			$entity->generateUuid();
 		}
 		
+		// Set timestamps for created and updated fields.
 		if ($entity instanceof TimeStampable) {
 			
 			$entity->setCreationTimeStamps();
 		}
 		
-		if (!$entity instanceof Authorable) {
-			
-			return;
-		}
-		
-		// For author
+		// If the author is not set already manually, set the currently logged in user.
 		if ($entity instanceof Authorable) {
 			
-			if (!$entity->getAuthor()) {
-				
+			if (! $entity->getAuthor()) {
+				// If no user is logged id, like with an api app, will throw an error.
 				$entity->setAuthor($this->security->getUser());
 			}
 		}
 	}
 	
+	/**
+	 * @param  LifecycleEventArgs  $args
+	 */
 	public function preUpdate(LifecycleEventArgs $args)
 	{
-		// If $entity is instance of neither, we return.
-		if (!$args->getEntity() instanceof TimeStampable) {
+		// Only update timestamps if entity implements TimeStampable.
+		if (! $args->getEntity() instanceof TimeStampable) {
 			
 			return;
 		}
@@ -69,17 +71,26 @@ class EntityListener
 		$args->getEntity()->setUpdatedTimestamps();
 	}
 	
+	/**
+	 * @param  LifecycleEventArgs  $args
+	 */
 	public function postLoad(LifecycleEventArgs $args)
 	{
-		/** @var AbstractEntity $entity */
-		$entity = $args->getEntity();
-		
 		// If our entity is not extending abstract entity, no need for the entity manager to be set.
-		if (!$entity instanceof AbstractEntity) {
+		if (! $args->getEntity() instanceof AbstractEntity) {
 			
 			return;
 		}
 		
+		$entity = $args->getEntity();
+		
+		// Set the entity manager.
 		$entity->setEntityManager($args->getEntityManager());
+		
+		// If entity implements statistics gathering, for instance view counts, increment the counters.
+		if ($entity instanceof CountableViews) {
+			
+			$entity->incrementViewCounters();
+		}
 	}
 }

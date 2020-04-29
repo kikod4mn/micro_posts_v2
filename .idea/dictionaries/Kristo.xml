@@ -3,6 +3,7 @@
     <words>
       <w>authorable</w>
       <w>fullname</w>
+      <w>sluggable</w>
       <w>trashable</w>
     </words>
   </dictionary>

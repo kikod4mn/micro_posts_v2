@@ -3,10 +3,14 @@
 namespace App\Entity;
 
 use App\Entity\Abstracts\AbstractEntity;
+use App\Entity\Concerns\HasSlug;
 use App\Entity\Concerns\HasTimestamps;
 use App\Entity\Concerns\CanTrash;
+use App\Entity\Concerns\HasUuid;
+use App\Entity\Contracts\Sluggable;
 use App\Entity\Contracts\TimeStampable;
 use App\Entity\Contracts\Trashable;
+use App\Entity\Contracts\Uniqable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -17,13 +21,19 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Table(name="`user`")
+ * @UniqueEntity(fields="uuid", message="How did this happen???? Uuid should be unique!!")
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @UniqueEntity(fields="email", message="This e-mail is already in use")
  * @UniqueEntity(fields="username", message="This username is already in use")
  */
-class User extends AbstractEntity implements UserInterface, TimeStampable, Trashable
+class User extends AbstractEntity implements UserInterface, TimeStampable, Trashable, Uniqable, Sluggable
 {
-	use HasTimestamps, CanTrash;
+	use HasUuid, HasTimestamps, CanTrash, HasSlug;
+	
+	/**
+	 * @var string
+	 */
+	const SLUGGABLE_FIELD = 'username';
 	
 	/** @var string */
 	public const ROLE_USER = 'ROLE_USER';
@@ -36,15 +46,6 @@ class User extends AbstractEntity implements UserInterface, TimeStampable, Trash
 	
 	/** @var string */
 	public const ROLE_SUPER_ADMINISTRATOR = 'ROLE_SUPER_ADMINISTRATOR';
-	
-	/**
-	 * @Groups({"default", "administer", "user-with-posts", "user-with-comments", "user-with-followers", "user-with-following"})
-	 * @ORM\Id()
-	 * @ORM\GeneratedValue()
-	 * @ORM\Column(type="bigint")
-	 * @var int
-	 */
-	protected $id;
 	
 	/**
 	 * @Groups({"default", "administer", "user-with-posts", "user-with-comments", "user-with-followers", "user-with-following"})
@@ -226,14 +227,6 @@ class User extends AbstractEntity implements UserInterface, TimeStampable, Trash
 		$this->followers     = new ArrayCollection();
 		$this->postsLiked    = new ArrayCollection();
 		$this->posts         = new ArrayCollection();
-	}
-	
-	/**
-	 * @return null|int
-	 */
-	public function getId(): ?int
-	{
-		return $this->id;
 	}
 	
 	/**

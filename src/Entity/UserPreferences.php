@@ -2,20 +2,20 @@
 
 namespace App\Entity;
 
+use App\Entity\Concerns\HasUuid;
+use App\Entity\Contracts\Uniqable;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
+ * @ORM\Table(name="`user_preferences`")
+ * @UniqueEntity(fields="uuid", message="How did this happen???? Uuid should be unique!!")
  * @ORM\Entity(repositoryClass="App\Repository\UserPreferencesRepository")
  */
-class UserPreferences
+class UserPreferences implements Uniqable
 {
-	/**
-	 * @ORM\Id()
-	 * @ORM\GeneratedValue()
-	 * @ORM\Column(type="bigint")
-	 */
-	protected $id;
+	use HasUuid;
 	
 	/**
 	 * @ORM\OneToOne(targetEntity="App\Entity\User", mappedBy="preferences")
@@ -40,14 +40,6 @@ class UserPreferences
 	 * @var bool
 	 */
 	protected $shouldReceiveEmailOnNewComments;
-	
-	/**
-	 * @return null|int
-	 */
-	public function getId(): ?int
-	{
-		return $this->id;
-	}
 	
 	/**
 	 * @return null|User

@@ -23,15 +23,24 @@ class FreshDbCommand extends Command
 		
 		$app = $this->getApplication();
 		
-		$dropDbCmd            = $app->find('doctrine:database:drop');
-		$dropDbCmdInput       = new ArrayInput(['command' => 'doctrine:database:drop', '--force' => true]);
-		$createDbCmd          = $app->find('doctrine:database:create');
-		$createDbCmdInput     = new ArrayInput(['command' => 'doctrine:database:create']);
+		$dropDbCmd      = $app->find('doctrine:database:drop');
+		$dropDbCmdInput = new ArrayInput(['command' => 'doctrine:database:drop', '--force' => true]);
+		
+		$createDbCmd      = $app->find('doctrine:database:create');
+		$createDbCmdInput = new ArrayInput(['command' => 'doctrine:database:create']);
+		
 		$createSchemaCmd      = $app->find('doctrine:schema:update');
 		$createSchemaCmdInput = new ArrayInput(['command' => 'doctrine:schema:update', '--force' => true]);
-		$runFixturesCmd       = $app->find('doctrine:fixtures:load');
-		$runFixturesCmdInput  = new ArrayInput(['command' => 'doctrine:fixtures:load']);
+		
+		$runFixturesCmd      = $app->find('doctrine:fixtures:load');
+		$runFixturesCmdInput = new ArrayInput(['command' => 'doctrine:fixtures:load']);
 		$runFixturesCmdInput->setInteractive(false);
+		
+		$migrateSession      = $app->find('migrate:session:db');
+		$migrateSessionInput = new ArrayInput(['command' => 'migrate:session:db']);
+		
+		$migrateRemember      = $app->find('migrate:remember:db');
+		$migrateRememberInput = new ArrayInput(['command' => 'migrate:remember:db']);
 		
 		$dropDbCmd->run($dropDbCmdInput, $output);
 		
@@ -40,6 +49,10 @@ class FreshDbCommand extends Command
 		$createSchemaCmd->run($createSchemaCmdInput, $output);
 		
 		$runFixturesCmd->run($runFixturesCmdInput, $output);
+		
+		$migrateSession->run($migrateSessionInput, $output);
+		
+		$migrateRemember->run($migrateRememberInput, $output);
 		
 		return 0;
 	}

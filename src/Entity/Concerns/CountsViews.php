@@ -42,6 +42,8 @@ trait CountsViews
 	{
 		$this->weeklyViewCount++;
 		$this->viewCount++;
+		
+		$this->em->flush();
 	}
 	
 	/**
@@ -51,5 +53,7 @@ trait CountsViews
 	public function resetWeeklyViewCount(): void
 	{
 		$this->weeklyViewCount = 0;
+		
+		$this->em->flush();
 	}
 }

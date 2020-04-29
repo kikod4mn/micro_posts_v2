@@ -3,35 +3,42 @@
 namespace App\Entity;
 
 use App\Entity\Abstracts\AbstractEntity;
+use App\Entity\Concerns\CanReport;
 use App\Entity\Concerns\CountsLikes;
 use App\Entity\Concerns\CountsViews;
 use App\Entity\Concerns\HasAuthor;
+use App\Entity\Concerns\HasSlug;
 use App\Entity\Concerns\HasTimestamps;
 use App\Entity\Concerns\CanPublish;
+use App\Entity\Concerns\HasUuid;
 use App\Entity\Contracts\Authorable;
 use App\Entity\Contracts\CountableLikes;
 use App\Entity\Contracts\CountableViews;
 use App\Entity\Contracts\Publishable;
+use App\Entity\Contracts\Reportable;
+use App\Entity\Contracts\Sluggable;
 use App\Entity\Contracts\TimeStampable;
+use App\Entity\Contracts\Uniqable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
+ * @ORM\Table(name="`comment`")
+ * @UniqueEntity(fields="uuid", message="How did this happen???? Uuid should be unique!!")
  * @ORM\Entity(repositoryClass="App\Repository\CommentRepository")
  */
-class Comment extends AbstractEntity implements CountableViews, CountableLikes, Authorable, TimeStampable, Publishable
+class Comment extends AbstractEntity implements CountableViews, CountableLikes, Authorable, TimeStampable, Publishable, Reportable, Uniqable, Sluggable
 {
-	use CountsLikes, CountsViews, HasAuthor, HasTimestamps, CanPublish;
+	use HasUuid, CountsLikes, CountsViews, HasAuthor, HasTimestamps, CanPublish, CanReport, HasSlug;
 	
 	/**
-	 * @ORM\Id()
-	 * @ORM\GeneratedValue()
-	 * @ORM\Column(type="bigint")
+	 * @var string
 	 */
-	protected $id;
+	const SLUGGABLE_FIELD = 'body';
 	
 	/**
 	 * @ORM\Column(type="string", length=2024)
@@ -112,14 +119,6 @@ class Comment extends AbstractEntity implements CountableViews, CountableLikes, 
 	}
 	
 	/**
-	 * @return null|int
-	 */
-	public function getId(): ?int
-	{
-		return $this->id;
-	}
-	
-	/**
 	 * @return string
 	 */
 	public function getBody(): ?string
@@ -188,51 +187,5 @@ class Comment extends AbstractEntity implements CountableViews, CountableLikes, 
 	public function likesCount(): ?int
 	{
 		return $this->likedBy->count();
-	}
-	
-	/**
-	 * @return bool
-	 */
-	public function isReported(): ?bool
-	{
-		return $this->reported;
-	}
-	
-	/**
-	 * Report a comment as inappropriate.
-	 */
-	public function report(): void
-	{
-		$this->reported = true;
-		$this->reportCount++;
-		// If more than 10 reports come in, hide the post from public
-		if ($this->reportCount > 10) {
-			$this->disApprove();
-		}
-	}
-	
-	/**
-	 * Clear a posts reported status and set reportCount to 0.
-	 */
-	public function clearReported(): void
-	{
-		$this->reportCount = 0;
-		$this->reported    = false;
-	}
-	
-	/**
-	 * @return int
-	 */
-	public function getReportCount(): ?int
-	{
-		return $this->reportCount;
-	}
-	
-	/**
-	 * @param  int  $reportCount
-	 */
-	public function setReportCount(int $reportCount): void
-	{
-		$this->reportCount = $reportCount;
 	}
 }

@@ -7,37 +7,41 @@ use App\Entity\Concerns\CanReport;
 use App\Entity\Concerns\CountsLikes;
 use App\Entity\Concerns\CountsViews;
 use App\Entity\Concerns\HasAuthor;
+use App\Entity\Concerns\HasSlug;
 use App\Entity\Concerns\HasTimestamps;
 use App\Entity\Concerns\CanPublish;
 use App\Entity\Concerns\CanTrash;
+use App\Entity\Concerns\HasUuid;
 use App\Entity\Contracts\Authorable;
 use App\Entity\Contracts\CountableLikes;
 use App\Entity\Contracts\CountableViews;
 use App\Entity\Contracts\Publishable;
 use App\Entity\Contracts\Reportable;
+use App\Entity\Contracts\Sluggable;
 use App\Entity\Contracts\TimeStampable;
 use App\Entity\Contracts\Trashable;
+use App\Entity\Contracts\Uniqable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
+ * @ORM\Table(name="`post`")
+ * @UniqueEntity(fields="uuid", message="How did this happen???? Uuid should be unique!!")
  * @ORM\Entity(repositoryClass="App\Repository\PostRepository")
  */
-class Post extends AbstractEntity implements CountableLikes, CountableViews, TimeStampable, Authorable, Publishable, Reportable, Trashable
+class Post extends AbstractEntity implements CountableLikes, CountableViews, TimeStampable, Authorable, Publishable, Reportable, Trashable, Uniqable, Sluggable
 {
-	use CountsViews, CountsLikes, HasAuthor, HasTimestamps, CanPublish, CanReport, CanTrash;
+	use HasUuid, CountsViews, CountsLikes, HasAuthor, HasTimestamps, CanPublish, CanReport, CanTrash, HasSlug;
 	
 	/**
-	 * @Groups({"default"})
-	 * @ORM\Id()
-	 * @ORM\GeneratedValue()
-	 * @ORM\Column(type="bigint")
+	 * @var string
 	 */
-	protected $id;
+	const SLUGGABLE_FIELD = 'body';
 	
 	/**
 	 * @Groups({"default"})
@@ -97,11 +101,6 @@ class Post extends AbstractEntity implements CountableLikes, CountableViews, Tim
 	{
 		$this->likedBy  = new ArrayCollection();
 		$this->comments = new ArrayCollection();
-	}
-	
-	public function getId(): ?int
-	{
-		return $this->id;
 	}
 	
 	/**

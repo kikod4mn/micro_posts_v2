@@ -23,23 +23,25 @@ class HomeController extends AbstractController
 		//			$item->trash();
 		//		}
 		
-		/** @var Post $post */
-		$post = $repository->findOneBy(['id' => 1]);
+				/** @var Post $post */
+				$post = $repository->findOneBy(['id' => 1]);
 		
-		$post->report($model->find(21));
+//				$post->report($model->find(21));
+
+//				dump($post->getWeeklyViewCount());
+//				dump($post->getViewCount());
+				die;
+		//
+		//		/** @var User $user */
+		//		$user = $model->getTrashed();
+		//
+		//		//		$user->trash();
+		//
+		//		dump($user);
+		//
+		//		die;
 		
-		dump($post->getReportedBy());
-		die;
-		
-		/** @var User $user */
-		$user = $model->getTrashed();
-		
-		//		$user->trash();
-		
-		dump($user);
-		
-		die;
-		
-		return $this->render('home/index.html.twig', ['user' => $user->toJson(0, ['default', 'user-with-posts', 'user-with-comments'])]);
+		return $this->render('home/index.html.twig', []);
+		//		return $this->render('home/index.html.twig', ['user' => $user->toJson(0, ['default', 'user-with-posts', 'user-with-comments'])]);
 	}
 }

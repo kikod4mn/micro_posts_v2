@@ -4,7 +4,7 @@ namespace App\Model\Abstracts;
 
 use App\Entity\Contracts\Publishable;
 use App\Entity\Contracts\Trashable;
-use App\Model\EntityTrashedException;
+use App\Model\Concerns\DecodesUuid;
 use App\Support\Concerns\WorksClassname;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
@@ -12,7 +12,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 abstract class AbstractModel
 {
-	use WorksClassname;
+	use WorksClassname, DecodesUuid;
 	
 	/**
 	 * @var ServiceEntityRepository
@@ -60,7 +60,7 @@ abstract class AbstractModel
 	
 	/**
 	 * @param  int  $id
-	 * @return mixed
+	 * @return null|mixed
 	 */
 	public function find(int $id)
 	{
@@ -75,6 +75,7 @@ abstract class AbstractModel
 	}
 	
 	/**
+	 * If parameter not found, throws exception.
 	 * @param  int  $id
 	 * @return mixed
 	 */

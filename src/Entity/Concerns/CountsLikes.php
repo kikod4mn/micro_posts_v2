@@ -40,6 +40,8 @@ trait CountsLikes
 	{
 		$this->likeCount++;
 		$this->weeklyLikeCount++;
+		
+		$this->em->flush();
 	}
 	
 	/**
@@ -49,5 +51,7 @@ trait CountsLikes
 	public function resetWeeklyLikeCounter(): void
 	{
 		$this->weeklyLikeCount = 0;
+		
+		$this->em->flush();
 	}
 }
