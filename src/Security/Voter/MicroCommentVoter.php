@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Security\Voter;
 
-use App\Entity\Comment;
+use App\Entity\MicroComment;
 use App\Entity\User;
 use App\Security\Voter\Concerns\ChecksPermissions;
 use App\Security\Voter\Contracts\Actionable;
@@ -14,7 +14,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class CommentVoter extends Voter implements Actionable
+class MicroCommentVoter extends Voter implements Actionable
 {
 	use ChecksPermissions;
 	
@@ -43,15 +43,15 @@ class CommentVoter extends Voter implements Actionable
 	 * @param  mixed   $subject
 	 * @return bool
 	 */
-	protected function supports($attribute, $subject): bool
+	public function supports($attribute, $subject): bool
 	{
 		return in_array($attribute, [self::EDIT, self::VIEW, self::DELETE])
-			&& $subject instanceof Comment;
+			&& $subject instanceof MicroComment;
 	}
 	
 	/**
 	 * @param  string          $attribute
-	 * @param  Comment   $subject
+	 * @param  MicroComment    $subject
 	 * @param  TokenInterface  $token
 	 * @return bool
 	 */
@@ -59,10 +59,10 @@ class CommentVoter extends Voter implements Actionable
 	{
 		switch ($attribute) {
 			case self::VIEW:
-				return $subject->isPublished() || $this->isOwner($subject) || $this->isAdmin();
+				return $this->isAdmin() || $this->isOwner($subject) || $subject->isPublished();
 			case self::EDIT:
 			case self::DELETE:
-				return $this->isOwner($subject) || $this->isAdmin();
+				return $this->isAdmin() || $this->isOwner($subject);
 		}
 		
 		throw new LogicException('This code should not be reached!');

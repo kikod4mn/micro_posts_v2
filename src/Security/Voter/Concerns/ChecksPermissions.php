@@ -12,6 +12,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 trait ChecksPermissions
 {
+	/**
+	 * @param  mixed  $subject
+	 * @return bool
+	 */
 	protected function isOwner($subject): bool
 	{
 		if (! $this->isUser()) {
@@ -22,6 +26,10 @@ trait ChecksPermissions
 		return $this->ownerCheckMethod($subject);
 	}
 	
+	/**
+	 * @param  Authorable|User|UserProfile|UserPreferences|mixed  $subject
+	 * @return bool
+	 */
 	protected function ownerCheckMethod($subject): bool
 	{
 		switch ($subject) {
@@ -36,11 +44,17 @@ trait ChecksPermissions
 		}
 	}
 	
+	/**
+	 * @return bool
+	 */
 	protected function isAdmin(): bool
 	{
 		return $this->security->isGranted(User::ROLE_ADMINISTRATOR);
 	}
 	
+	/**
+	 * @return bool
+	 */
 	protected function isUser(): bool
 	{
 		return ! is_null($this->user) && $this->user instanceof UserInterface;

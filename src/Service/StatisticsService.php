@@ -4,8 +4,8 @@ declare(strict_types = 1);
 
 namespace App\Service;
 
-use App\Repository\CommentRepository;
-use App\Repository\PostRepository;
+use App\Repository\BlogPostCommentRepository;
+use App\Repository\MicroPostRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
@@ -14,12 +14,12 @@ class StatisticsService
 	private $statisticsHaveBeenSent;
 	
 	/**
-	 * @var PostRepository
+	 * @var MicroPostRepository
 	 */
 	private $postRepository;
 	
 	/**
-	 * @var CommentRepository
+	 * @var BlogPostCommentRepository
 	 */
 	private $commentRepository;
 	
@@ -70,15 +70,15 @@ class StatisticsService
 	
 	/**
 	 * StatisticsService constructor.
-	 * @param  PostRepository          $postRepository
-	 * @param  CommentRepository       $commentRepository
-	 * @param  MailSender              $mailSender
-	 * @param  EntityManagerInterface  $entityManager
-	 * @param  string                  $mailTo
+	 * @param  MicroPostRepository        $postRepository
+	 * @param  BlogPostCommentRepository  $commentRepository
+	 * @param  MailSender                 $mailSender
+	 * @param  EntityManagerInterface     $entityManager
+	 * @param  string                     $mailTo
 	 */
 	public function __construct(
-		PostRepository $postRepository,
-		CommentRepository $commentRepository,
+		MicroPostRepository $postRepository,
+		BlogPostCommentRepository $commentRepository,
 		MailSender $mailSender,
 		EntityManagerInterface $entityManager,
 		string $mailTo

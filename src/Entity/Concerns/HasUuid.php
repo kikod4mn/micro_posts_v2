@@ -33,20 +33,25 @@ trait HasUuid
 	
 	/**
 	 * @return null|int
+	 * NOTE : Symfony does not like strict types, attempt to cast the Id to an integer before returning.
 	 */
 	public function getId(): ?int
 	{
-		return $this->id;
+		return (int) $this->id;
 	}
 	
 	/**
 	 * @return null|string
+	 * NOTE : Symfony does not like strict types, attempt to cast the Uuid to a string before returning.
 	 */
 	public function getUuid(): ?string
 	{
-		return $this->uuid;
+		return (string) $this->uuid;
 	}
 	
+	/**
+	 * Generate a uuid for the entity.
+	 */
 	public function generateUuid(): void
 	{
 		$this->uuid = Uuid::uuid4();

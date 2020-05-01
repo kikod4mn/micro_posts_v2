@@ -7,6 +7,7 @@ namespace App\EventListener;
 use App\Entity\Abstracts\AbstractEntity;
 use App\Entity\Contracts\Authorable;
 use App\Entity\Contracts\CountableViews;
+use App\Entity\Contracts\Sluggable;
 use App\Entity\Contracts\TimeStampable;
 use App\Entity\Contracts\Uniqable;
 use Doctrine\ORM\Event\LifecycleEventArgs;
@@ -56,6 +57,13 @@ class EntityListener
 				// If no user is logged id, like with an api app, will throw an error.
 				$entity->setAuthor($this->security->getUser());
 			}
+		}
+		
+		// If slug needs to be set and is not set yet, attempt to generate one.
+		// See "setSlug" in the "HasSlug" trait.
+		if ($entity instanceof Sluggable && null === $entity->getSlug()) {
+			
+			$entity->setSlug();
 		}
 	}
 	

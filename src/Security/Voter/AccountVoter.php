@@ -42,7 +42,7 @@ class AccountVoter extends Voter implements Actionable
 	 * @param  mixed   $subject
 	 * @return bool
 	 */
-	protected function supports($attribute, $subject): bool
+	public function supports($attribute, $subject): bool
 	{
 		return in_array($attribute, [self::EDIT, self::VIEW, self::DELETE])
 			&& $subject instanceof User;
@@ -60,7 +60,7 @@ class AccountVoter extends Voter implements Actionable
 			case self::VIEW:
 			case self::EDIT:
 			case self::DELETE:
-				return $this->isOwner($subject) || $this->isAdmin();
+				return $this->isAdmin() || $this->isOwner($subject);
 		}
 		
 		throw new LogicException('This code should not be reached!');

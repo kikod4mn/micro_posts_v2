@@ -4,10 +4,10 @@ declare(strict_types = 1);
 
 namespace App\Tests\Security;
 
+use App\Entity\Notification;
 use App\Entity\User;
-use App\Entity\UserProfile;
 use App\Security\Voter\Contracts\Actionable;
-use App\Security\Voter\ProfileVoter;
+use App\Security\Voter\NotificationVoter;
 use App\Tests\Security\Concerns\CreatesSecurityMocks;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
@@ -15,11 +15,11 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 /**
- * @covers  \App\Security\Voter\ProfileVoter
- * Class ProfileVoterTest
+ * @covers  \App\Security\Voter\NotificationVoter
+ * Class NotificationVoter
  * @package App\Tests\Security
  */
-class ProfileVoterTest extends TestCase implements Actionable
+class NotificationVoterTest extends TestCase implements Actionable
 {
 	use CreatesSecurityMocks;
 	
@@ -37,7 +37,7 @@ class ProfileVoterTest extends TestCase implements Actionable
 			->willReturn($user)
 		;
 		
-		new ProfileVoter($security);
+		new NotificationVoter($security);
 	}
 	
 	public function provideConstruct()
@@ -67,7 +67,7 @@ class ProfileVoterTest extends TestCase implements Actionable
 			->willReturn($this->createUser(1))
 		;
 		
-		$voter = new ProfileVoter($security);
+		$voter = new NotificationVoter($security);
 		
 		static::assertSame(
 			$expected,
@@ -77,52 +77,52 @@ class ProfileVoterTest extends TestCase implements Actionable
 	
 	public function provideSupports()
 	{
-		yield 'voter supports view on UserProfile' => [
+		yield 'voter supports view on Notification' => [
 			self::VIEW,
-			new UserProfile(),
+			new Notification(),
 			true,
 		];
 		
-		yield 'voter supports edit on UserProfile' => [
+		yield 'voter supports edit on Notification' => [
 			self::EDIT,
-			new UserProfile(),
+			new Notification(),
 			true,
 		];
 		
-		yield 'voter supports delete on UserProfile' => [
+		yield 'voter supports delete on Notification' => [
 			self::DELETE,
-			new UserProfile(),
+			new Notification(),
 			true,
 		];
 		
-		yield 'voter does not support view on ProfileVoterTest' => [
+		yield 'voter does not support view on NotificationVoterTest' => [
 			self::VIEW,
-			new ProfileVoterTest(),
+			new NotificationVoterTest(),
 			false,
 		];
 		
-		yield 'voter does not support edit on ProfileVoterTest' => [
+		yield 'voter does not support edit on NotificationVoterTest' => [
 			self::EDIT,
-			new ProfileVoterTest(),
+			new NotificationVoterTest(),
 			false,
 		];
 		
-		yield 'voter does not support delete on ProfileVoterTest' => [
+		yield 'voter does not support delete on NotificationVoterTest' => [
 			self::DELETE,
-			new ProfileVoterTest(),
+			new NotificationVoterTest(),
 			false,
 		];
 	}
 	
 	/**
 	 * @dataProvider provideCases
-	 * @param  string       $attribute
-	 * @param  UserProfile  $profile
-	 * @param  null|User    $user
-	 * @param  int          $expected
-	 * @param  bool         $adminTest
+	 * @param  string        $attribute
+	 * @param  Notification  $notification
+	 * @param  null|User     $user
+	 * @param  int           $expected
+	 * @param  bool          $adminTest
 	 */
-	public function testVoteOnAttribute(string $attribute, UserProfile $profile, ?User $user, int $expected, bool $adminTest)
+	public function testVoteOnAttribute(string $attribute, Notification $notification, ?User $user, int $expected, bool $adminTest)
 	{
 		$security = $this->createSecurity();
 		
@@ -142,7 +142,7 @@ class ProfileVoterTest extends TestCase implements Actionable
 			;
 		}
 		
-		$voter = new ProfileVoter($security);
+		$voter = new NotificationVoter($security);
 		
 		// If we pass in a user, create a token with fake data otherwise anonymous token.
 		if (! is_null($user)) {
@@ -155,103 +155,103 @@ class ProfileVoterTest extends TestCase implements Actionable
 		
 		static::assertSame(
 			$expected,
-			$voter->vote($token, $profile, [$attribute])
+			$voter->vote($token, $notification, [$attribute])
 		);
 	}
 	
 	public function provideCases()
 	{
-		yield 'anonymous cannot see' => [
+		yield 'anonymous cannot see notification' => [
 			self::VIEW,
-			(new UserProfile())->setUser($this->createUser(1)),
+			(new Notification())->setAuthor($this->createUser(1)),
 			null,
 			Voter::ACCESS_DENIED,
 			false,
 		];
 		
-		yield 'anonymous cannot edit' => [
+		yield 'anonymous cannot edit notification' => [
 			self::EDIT,
-			(new UserProfile())->setUser($this->createUser(1)),
+			(new Notification())->setAuthor($this->createUser(1)),
 			null,
 			Voter::ACCESS_DENIED,
 			false,
 		];
 		
-		yield 'anonymous cannot delete' => [
+		yield 'anonymous cannot delete notification' => [
 			self::DELETE,
-			(new UserProfile())->setUser($this->createUser(1)),
+			(new Notification())->setAuthor($this->createUser(1)),
 			null,
 			Voter::ACCESS_DENIED,
 			false,
 		];
 		
-		yield 'non-owner cannot see' => [
+		yield 'non-owner can not see notification' => [
 			self::VIEW,
-			(new UserProfile())->setUser($this->createUser(1)),
+			(new Notification())->setAuthor($this->createUser(1)),
 			$this->createUser(2),
 			Voter::ACCESS_DENIED,
 			false,
 		];
 		
-		yield 'non-owner cannot edit' => [
+		yield 'non-owner can not edit notification' => [
 			self::EDIT,
-			(new UserProfile())->setUser($this->createUser(1)),
+			(new Notification())->setAuthor($this->createUser(1)),
 			$this->createUser(2),
 			Voter::ACCESS_DENIED,
 			false,
 		];
 		
-		yield 'non-owner cannot delete' => [
+		yield 'non-owner can not delete notification' => [
 			self::DELETE,
-			(new UserProfile())->setUser($this->createUser(1)),
+			(new Notification())->setAuthor($this->createUser(1)),
 			$this->createUser(2),
 			Voter::ACCESS_DENIED,
 			false,
 		];
 		
-		yield 'owner can see' => [
+		yield 'owner can see notification' => [
 			self::VIEW,
-			(new UserProfile())->setUser($this->createUser(1)),
+			(new Notification())->setAuthor($this->createUser(1)),
 			$this->createUser(1),
 			Voter::ACCESS_GRANTED,
 			false,
 		];
 		
-		yield 'owner can edit' => [
+		yield 'owner can edit notification' => [
 			self::EDIT,
-			(new UserProfile())->setUser($this->createUser(1)),
+			(new Notification())->setAuthor($this->createUser(1)),
 			$this->createUser(1),
 			Voter::ACCESS_GRANTED,
 			false,
 		];
 		
-		yield 'owner can delete' => [
+		yield 'owner can delete notification' => [
 			self::DELETE,
-			(new UserProfile())->setUser($this->createUser(1)),
+			(new Notification())->setAuthor($this->createUser(1)),
 			$this->createUser(1),
 			Voter::ACCESS_GRANTED,
 			false,
 		];
 		
-		yield 'admin can see' => [
+		yield 'admin can see notification' => [
 			self::VIEW,
-			(new UserProfile())->setUser($this->createUser(1)),
+			(new Notification())->setAuthor($this->createUser(1)),
 			$this->createAdmin(1),
 			Voter::ACCESS_GRANTED,
 			true,
 		];
 		
-		yield 'admin can edit' => [
+		yield 'admin can edit notification' => [
 			self::EDIT,
-			(new UserProfile())->setUser($this->createUser(1)),
+			(new Notification())->setAuthor($this->createUser(1)),
 			$this->createAdmin(1),
 			Voter::ACCESS_GRANTED,
 			true,
 		];
 		
-		yield 'admin can delete' => [
+		yield 'admin can delete notification' => [
 			self::DELETE,
-			(new UserProfile())->setUser($this->createUser(1)),
+			(new Notification())->setAuthor($this->createUser(1)),
 			$this->createAdmin(1),
 			Voter::ACCESS_GRANTED,
 			true,

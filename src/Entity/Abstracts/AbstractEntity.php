@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Entity\Abstracts;
 
-use App\Entity\Concerns\CanNormalize;
+use App\Entity\Concerns\IsNormalizable;
 use App\Entity\Contracts\Normalizable;
 use App\Entity\Contracts\Trashable;
 use App\Support\Contracts\Arrayable;
@@ -22,7 +22,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 abstract class AbstractEntity implements Arrayable, Jsonable, JsonSerializable, Stringable, Normalizable
 {
-	use CanNormalize;
+	use IsNormalizable;
 	
 	/**
 	 * Default name for created at timestamp field.

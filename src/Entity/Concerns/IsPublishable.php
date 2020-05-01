@@ -6,7 +6,7 @@ namespace App\Entity\Concerns;
 
 use App\Entity\Contracts\Publishable;
 
-trait CanPublish
+trait IsPublishable
 {
 	/**
 	 * @ORM\Column(type="boolean", nullable=false)

@@ -8,7 +8,7 @@ use App\Entity\Contracts\Trashable;
 use DateTime;
 use DateTimeInterface;
 
-trait CanTrash
+trait IsTrashable
 {
 	/**
 	 * @ORM\Column(type="datetime", nullable=true)

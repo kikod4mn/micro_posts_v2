@@ -7,8 +7,10 @@ namespace App\Entity;
 use App\Entity\Abstracts\AbstractEntity;
 use App\Entity\Concerns\HasSlug;
 use App\Entity\Concerns\HasTimestamps;
-use App\Entity\Concerns\CanTrash;
+use App\Entity\Concerns\IsTrashable;
 use App\Entity\Concerns\HasUuid;
+use App\Entity\Concerns\UserConcerns\HasBlogPosts;
+use App\Entity\Concerns\UserConcerns\HasMicroPosts;
 use App\Entity\Contracts\Sluggable;
 use App\Entity\Contracts\TimeStampable;
 use App\Entity\Contracts\Trashable;
@@ -30,7 +32,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class User extends AbstractEntity implements UserInterface, TimeStampable, Trashable, Uniqable, Sluggable
 {
-	use HasUuid, HasTimestamps, CanTrash, HasSlug;
+	use HasUuid, HasTimestamps, IsTrashable, HasSlug, HasBlogPosts, HasMicroPosts;
 	
 	/**
 	 * @var string
@@ -104,46 +106,6 @@ class User extends AbstractEntity implements UserInterface, TimeStampable, Trash
 	protected $role = self::ROLE_USER;
 	
 	/**
-	 * @Groups({"administer", "user-with-posts"})
-	 * @ORM\OneToMany(targetEntity="App\Entity\Post", mappedBy="author", cascade={"all"})
-	 * @var Collection
-	 */
-	protected $posts;
-	
-	/**
-	 * @Groups({"administer", "user-with-posts"})
-	 * @ORM\ManyToMany(targetEntity="App\Entity\Post", mappedBy="likedBy")
-	 * @var Collection
-	 */
-	protected $postsLiked;
-	
-	/**
-	 * @ORM\ManyToMany(targetEntity="App\Entity\Post", mappedBy="reportedBy")
-	 * @var Collection
-	 */
-	protected $reportedPosts;
-	
-	/**
-	 * @Groups({"administer", "user-with-comments"})
-	 * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="author", cascade={"all"})
-	 * @var Collection
-	 */
-	protected $comments;
-	
-	/**
-	 * @Groups({"administer", "user-with-comments"})
-	 * @ORM\ManyToMany(targetEntity="App\Entity\Comment", mappedBy="likedBy")
-	 * @var Collection
-	 */
-	protected $commentsLiked;
-	
-	/**
-	 * @ORM\ManyToMany(targetEntity="App\Entity\Comment", mappedBy="reportedBy")
-	 * @var Collection
-	 */
-	protected $reportedComments;
-	
-	/**
 	 * @Groups({"administer", "user-with-followers"})
 	 * @ORM\ManyToMany(targetEntity="User", mappedBy="following")
 	 * @var Collection
@@ -207,13 +169,6 @@ class User extends AbstractEntity implements UserInterface, TimeStampable, Trash
 	/**
 	 * @Groups({"administer"})
 	 * @ORM\Column(type="boolean", nullable=false)
-	 * @var bool
-	 */
-	protected $reported = false;
-	
-	/**
-	 * @Groups({"administer"})
-	 * @ORM\Column(type="boolean", nullable=false)
 	 * @var boolean
 	 */
 	protected $forcedPasswordChange = false;
@@ -223,12 +178,17 @@ class User extends AbstractEntity implements UserInterface, TimeStampable, Trash
 	 */
 	public function __construct()
 	{
-		$this->comments      = new ArrayCollection();
-		$this->commentsLiked = new ArrayCollection();
-		$this->following     = new ArrayCollection();
-		$this->followers     = new ArrayCollection();
-		$this->postsLiked    = new ArrayCollection();
-		$this->posts         = new ArrayCollection();
+		$this->blogPosts            = new ArrayCollection();
+		$this->blogPostsLiked       = new ArrayCollection();
+		$this->blogCommentsLiked    = new ArrayCollection();
+		$this->reportedBlogPosts    = new ArrayCollection();
+		$this->reportedBlogComments = new ArrayCollection();
+		
+		$this->microPosts            = new ArrayCollection();
+		$this->microPostsLiked       = new ArrayCollection();
+		$this->microCommentsLiked    = new ArrayCollection();
+		$this->reportedMicroPosts    = new ArrayCollection();
+		$this->reportedMicroComments = new ArrayCollection();
 	}
 	
 	/**
@@ -366,14 +326,6 @@ class User extends AbstractEntity implements UserInterface, TimeStampable, Trash
 	/**
 	 * @return null|Collection
 	 */
-	public function getPosts(): ?Collection
-	{
-		return $this->posts;
-	}
-	
-	/**
-	 * @return null|Collection
-	 */
 	public function getFollowers(): ?Collection
 	{
 		return $this->followers;
@@ -417,30 +369,6 @@ class User extends AbstractEntity implements UserInterface, TimeStampable, Trash
 	public function getFollowing(): ?Collection
 	{
 		return $this->following;
-	}
-	
-	/**
-	 * @return null|Collection
-	 */
-	public function getPostsLiked(): ?Collection
-	{
-		return $this->postsLiked;
-	}
-	
-	/**
-	 * @return null|Collection
-	 */
-	public function getComments(): ?Collection
-	{
-		return $this->comments;
-	}
-	
-	/**
-	 * @return null|Collection
-	 */
-	public function getCommentsLiked(): ?Collection
-	{
-		return $this->commentsLiked;
 	}
 	
 	/**
@@ -547,25 +475,6 @@ class User extends AbstractEntity implements UserInterface, TimeStampable, Trash
 	public function setProfile(UserProfile $profile): self
 	{
 		$this->profile = $profile;
-		
-		return $this;
-	}
-	
-	/**
-	 * @return null|bool
-	 */
-	public function isReported(): ?bool
-	{
-		return $this->reported;
-	}
-	
-	/**
-	 * Report a user's behaviour as inappropriate.
-	 * @return User
-	 */
-	public function report(): self
-	{
-		$this->reported = true;
 		
 		return $this;
 	}

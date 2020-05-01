@@ -14,7 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Trait requires a field of reportedBy on the entity with a many to many relationship to the user entity.
  */
-trait CanReport
+trait IsReportable
 {
 	/**
 	 * @ORM\Column(type="boolean", nullable=false)

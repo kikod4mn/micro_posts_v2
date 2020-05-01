@@ -4,10 +4,10 @@ declare(strict_types = 1);
 
 namespace App\Controller;
 
-use App\Entity\Post;
+use App\Entity\MicroPost;
 use App\Entity\User;
 use App\Model\UserModel;
-use App\Repository\PostRepository;
+use App\Repository\MicroPostRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -17,7 +17,7 @@ class HomeController extends AbstractController
 	/**
 	 * @Route("/", name="homepage")
 	 */
-	public function index(UserModel $model, PostRepository $repository): Response
+	public function index(UserModel $model, MicroPostRepository $repository): Response
 	{
 		//		$test = $model->findMany([12, 5, 6]);
 		//		/** @var User $item */
@@ -25,7 +25,7 @@ class HomeController extends AbstractController
 		//			$item->trash();
 		//		}
 		
-				/** @var Post $post */
+				/** @var MicroPost $post */
 				$post = $repository->findOneBy(['id' => 1]);
 		
 //				$post->report($model->find(21));

@@ -39,7 +39,7 @@ class UserFixtures extends BaseFixture
 	 */
 	protected function loadData(ObjectManager $manager): void
 	{
-		$user  = new User();
+//		$user  = new User();
 		$faker = Factory::create();
 		$this->createMany(
 			User::class, 50, function (User $user, $i) use ($faker) {

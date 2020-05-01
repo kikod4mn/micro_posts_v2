@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Security\Voter;
 
-use App\Entity\Post;
+use App\Entity\MicroPost;
 use App\Entity\User;
 use App\Security\Voter\Concerns\ChecksPermissions;
 use App\Security\Voter\Contracts\Actionable;
@@ -43,15 +43,15 @@ class PostVoter extends Voter implements Actionable
 	 * @param  mixed   $subject
 	 * @return bool
 	 */
-	protected function supports($attribute, $subject): bool
+	public function supports($attribute, $subject): bool
 	{
 		return in_array($attribute, [self::EDIT, self::VIEW, self::DELETE])
-			&& $subject instanceof Post;
+			&& $subject instanceof MicroPost;
 	}
 	
 	/**
 	 * @param  string          $attribute
-	 * @param  Post            $subject
+	 * @param  MicroPost       $subject
 	 * @param  TokenInterface  $token
 	 * @return bool
 	 */
@@ -59,10 +59,10 @@ class PostVoter extends Voter implements Actionable
 	{
 		switch ($attribute) {
 			case self::VIEW:
-				return ! $subject->isPublished() || $this->isOwner($subject) || $this->isAdmin();
+				return $this->isAdmin() || $this->isOwner($subject) || $subject->isPublished();
 			case self::EDIT:
 			case self::DELETE:
-				return $this->isOwner($subject) || $this->isAdmin();
+				return $this->isAdmin() || $this->isOwner($subject);
 		}
 		
 		throw new LogicException('This code should not be reached!');

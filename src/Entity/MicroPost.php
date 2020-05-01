@@ -5,14 +5,14 @@ declare(strict_types = 1);
 namespace App\Entity;
 
 use App\Entity\Abstracts\AbstractEntity;
-use App\Entity\Concerns\CanReport;
+use App\Entity\Concerns\IsReportable;
 use App\Entity\Concerns\CountsLikes;
 use App\Entity\Concerns\CountsViews;
 use App\Entity\Concerns\HasAuthor;
 use App\Entity\Concerns\HasSlug;
 use App\Entity\Concerns\HasTimestamps;
-use App\Entity\Concerns\CanPublish;
-use App\Entity\Concerns\CanTrash;
+use App\Entity\Concerns\IsPublishable;
+use App\Entity\Concerns\IsTrashable;
 use App\Entity\Concerns\HasUuid;
 use App\Entity\Contracts\Authorable;
 use App\Entity\Contracts\CountableLikes;
@@ -32,14 +32,15 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Table(name="`post`")
+ * @ORM\Table(name="`micro_post`")
  * @UniqueEntity(fields="uuid", message="How did this happen???? Uuid should be unique!!")
- * @ORM\Entity(repositoryClass="App\Repository\PostRepository")
+ * @UniqueEntity(fields="slug", message="How did this happen???? Slug should be unique!!")
+ * @ORM\Entity(repositoryClass="App\Repository\MicroPostRepository")
  */
-class Post extends AbstractEntity
+class MicroPost extends AbstractEntity
 	implements CountableLikes, CountableViews, TimeStampable, Authorable, Publishable, Reportable, Trashable, Uniqable, Sluggable
 {
-	use HasUuid, CountsViews, CountsLikes, HasAuthor, HasTimestamps, CanPublish, CanReport, CanTrash, HasSlug;
+	use HasUuid, CountsViews, CountsLikes, HasAuthor, HasTimestamps, IsPublishable, IsReportable, IsTrashable, HasSlug;
 	
 	/**
 	 * @var string
@@ -48,14 +49,14 @@ class Post extends AbstractEntity
 	
 	/**
 	 * @Groups({"default"})
-	 * @ORM\Column(type="string", length=2024)
+	 * @ORM\Column(type="text")
 	 * @Assert\NotBlank()
 	 * @Assert\Length(min="10", max="280", minMessage="Please enter a minimum of 10 characters!", maxMessage="No more than 280 characters allowed!")
 	 */
 	protected $body;
 	
 	/**
-	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="posts")
+	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="microPosts")
 	 * @ORM\JoinColumn(nullable=false)
 	 * @ORM\OrderBy({"createdAt" = "DESC"})
 	 * @var Authorable
@@ -64,10 +65,10 @@ class Post extends AbstractEntity
 	
 	/**
 	 * @Groups({"default", "user-with-posts"})
-	 * @ORM\ManyToMany(targetEntity="User", inversedBy="postsLiked", cascade={"all"})
-	 * @ORM\JoinTable(name="post_likes",
+	 * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="microPostsLiked", cascade={"all"})
+	 * @ORM\JoinTable(name="micro_post_likes",
 	 *     joinColumns={
-	 *          @ORM\JoinColumn(name="post_id", referencedColumnName="id", nullable=false)
+	 *          @ORM\JoinColumn(name="micro_post_id", referencedColumnName="id", nullable=false)
 	 *     },
 	 *     inverseJoinColumns={
 	 *          @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
@@ -79,18 +80,18 @@ class Post extends AbstractEntity
 	
 	/**
 	 * @Groups({"default", "user-with-posts"})
-	 * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="post", cascade={"all"})
+	 * @ORM\OneToMany(targetEntity="App\Entity\MicroComment", mappedBy="microPost", cascade={"all"})
 	 * @var Collection
 	 */
 	protected $comments;
 	
 	/**
-	 * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="reportedPosts")
-	 * @ORM\JoinTable(name="reported_posts", joinColumns={
+	 * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="reportedMicroPosts")
+	 * @ORM\JoinTable(name="reported_micro_posts", joinColumns={
 	 *          @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
 	 *      },
 	 *      inverseJoinColumns={
-	 *          @ORM\JoinColumn(name="post_id", referencedColumnName="id", nullable=false)
+	 *          @ORM\JoinColumn(name="micro_post_id", referencedColumnName="id", nullable=false)
 	 *      }
 	 * )
 	 * @var Collection
@@ -116,7 +117,7 @@ class Post extends AbstractEntity
 	
 	/**
 	 * @param  string  $body
-	 * @return Post
+	 * @return MicroPost
 	 */
 	public function setBody(string $body): self
 	{

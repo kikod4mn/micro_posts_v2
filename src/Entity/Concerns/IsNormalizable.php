@@ -12,7 +12,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 
-trait CanNormalize
+trait IsNormalizable
 {
 	/**
 	 * @param  string|string[]  $groups

@@ -13,25 +13,37 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserChecker implements UserCheckerInterface
 {
-	public function checkPreAuth(UserInterface $user)
+	/**
+	 * @param  UserInterface  $user
+	 */
+	public function checkPreAuth(UserInterface $user): void
 	{
-		if (!$user instanceof User) {
+		// Only allow instances of our User class to be checked
+		if (! $user instanceof User) {
 			
 			return;
 		}
+		
+		// If user has been trashed, throw Exception and prevent login.
 		if ($user instanceof Trashable && $user->isTrashed()) {
 			
 			throw new AccountDeletedException();
 		}
 	}
 	
-	public function checkPostAuth(UserInterface $user)
+	/**
+	 * @param  UserInterface  $user
+	 */
+	public function checkPostAuth(UserInterface $user): void
 	{
-		if (!$user instanceof User) {
+		// Only allow instances of our User class to be checked
+		if (! $user instanceof User) {
 			
 			return;
 		}
-		if (!$user->isActivated()) {
+		
+		// If the user is not yet activated, throw Exception and prevent further action.
+		if (! $user->isActivated()) {
 			
 			throw new AccountNotActiveException();
 		}

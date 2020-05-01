@@ -5,9 +5,10 @@ declare(strict_types = 1);
 namespace App\Tests\Security;
 
 use App\Entity\User;
+use App\Entity\UserPreferences;
 use App\Entity\UserProfile;
 use App\Security\Voter\Contracts\Actionable;
-use App\Security\Voter\ProfileVoter;
+use App\Security\Voter\PreferencesVoter;
 use App\Tests\Security\Concerns\CreatesSecurityMocks;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
@@ -19,7 +20,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
  * Class ProfileVoterTest
  * @package App\Tests\Security
  */
-class ProfileVoterTest extends TestCase implements Actionable
+class PreferencesVoterTest extends TestCase implements Actionable
 {
 	use CreatesSecurityMocks;
 	
@@ -37,7 +38,7 @@ class ProfileVoterTest extends TestCase implements Actionable
 			->willReturn($user)
 		;
 		
-		new ProfileVoter($security);
+		new PreferencesVoter($security);
 	}
 	
 	public function provideConstruct()
@@ -67,7 +68,7 @@ class ProfileVoterTest extends TestCase implements Actionable
 			->willReturn($this->createUser(1))
 		;
 		
-		$voter = new ProfileVoter($security);
+		$voter = new PreferencesVoter($security);
 		
 		static::assertSame(
 			$expected,
@@ -77,52 +78,52 @@ class ProfileVoterTest extends TestCase implements Actionable
 	
 	public function provideSupports()
 	{
-		yield 'voter supports view on UserProfile' => [
+		yield 'voter supports view on UserPreferences' => [
 			self::VIEW,
-			new UserProfile(),
+			new UserPreferences(),
 			true,
 		];
 		
-		yield 'voter supports edit on UserProfile' => [
+		yield 'voter supports edit on UserPreferences' => [
 			self::EDIT,
-			new UserProfile(),
+			new UserPreferences(),
 			true,
 		];
 		
-		yield 'voter supports delete on UserProfile' => [
+		yield 'voter supports delete on UserPreferences' => [
 			self::DELETE,
-			new UserProfile(),
+			new UserPreferences(),
 			true,
 		];
 		
-		yield 'voter does not support view on ProfileVoterTest' => [
+		yield 'voter does not support view on PreferencesVoterTest' => [
 			self::VIEW,
-			new ProfileVoterTest(),
+			new PreferencesVoterTest(),
 			false,
 		];
 		
-		yield 'voter does not support edit on ProfileVoterTest' => [
+		yield 'voter does not support edit on PreferencesVoterTest' => [
 			self::EDIT,
-			new ProfileVoterTest(),
+			new PreferencesVoterTest(),
 			false,
 		];
 		
-		yield 'voter does not support delete on ProfileVoterTest' => [
+		yield 'voter does not support delete on PreferencesVoterTest' => [
 			self::DELETE,
-			new ProfileVoterTest(),
+			new PreferencesVoterTest(),
 			false,
 		];
 	}
 	
 	/**
 	 * @dataProvider provideCases
-	 * @param  string       $attribute
-	 * @param  UserProfile  $profile
-	 * @param  null|User    $user
-	 * @param  int          $expected
-	 * @param  bool         $adminTest
+	 * @param  string           $attribute
+	 * @param  UserPreferences  $preferences
+	 * @param  null|User        $user
+	 * @param  int              $expected
+	 * @param  bool             $adminTest
 	 */
-	public function testVoteOnAttribute(string $attribute, UserProfile $profile, ?User $user, int $expected, bool $adminTest)
+	public function testVoteOnAttribute(string $attribute, UserPreferences $preferences, ?User $user, int $expected, bool $adminTest)
 	{
 		$security = $this->createSecurity();
 		
@@ -142,7 +143,7 @@ class ProfileVoterTest extends TestCase implements Actionable
 			;
 		}
 		
-		$voter = new ProfileVoter($security);
+		$voter = new PreferencesVoter($security);
 		
 		// If we pass in a user, create a token with fake data otherwise anonymous token.
 		if (! is_null($user)) {
@@ -155,7 +156,7 @@ class ProfileVoterTest extends TestCase implements Actionable
 		
 		static::assertSame(
 			$expected,
-			$voter->vote($token, $profile, [$attribute])
+			$voter->vote($token, $preferences, [$attribute])
 		);
 	}
 	
@@ -163,7 +164,7 @@ class ProfileVoterTest extends TestCase implements Actionable
 	{
 		yield 'anonymous cannot see' => [
 			self::VIEW,
-			(new UserProfile())->setUser($this->createUser(1)),
+			(new UserPreferences())->setUser($this->createUser(1)),
 			null,
 			Voter::ACCESS_DENIED,
 			false,
@@ -171,7 +172,7 @@ class ProfileVoterTest extends TestCase implements Actionable
 		
 		yield 'anonymous cannot edit' => [
 			self::EDIT,
-			(new UserProfile())->setUser($this->createUser(1)),
+			(new UserPreferences())->setUser($this->createUser(1)),
 			null,
 			Voter::ACCESS_DENIED,
 			false,
@@ -179,7 +180,7 @@ class ProfileVoterTest extends TestCase implements Actionable
 		
 		yield 'anonymous cannot delete' => [
 			self::DELETE,
-			(new UserProfile())->setUser($this->createUser(1)),
+			(new UserPreferences())->setUser($this->createUser(1)),
 			null,
 			Voter::ACCESS_DENIED,
 			false,
@@ -187,7 +188,7 @@ class ProfileVoterTest extends TestCase implements Actionable
 		
 		yield 'non-owner cannot see' => [
 			self::VIEW,
-			(new UserProfile())->setUser($this->createUser(1)),
+			(new UserPreferences())->setUser($this->createUser(1)),
 			$this->createUser(2),
 			Voter::ACCESS_DENIED,
 			false,
@@ -195,7 +196,7 @@ class ProfileVoterTest extends TestCase implements Actionable
 		
 		yield 'non-owner cannot edit' => [
 			self::EDIT,
-			(new UserProfile())->setUser($this->createUser(1)),
+			(new UserPreferences())->setUser($this->createUser(1)),
 			$this->createUser(2),
 			Voter::ACCESS_DENIED,
 			false,
@@ -203,7 +204,7 @@ class ProfileVoterTest extends TestCase implements Actionable
 		
 		yield 'non-owner cannot delete' => [
 			self::DELETE,
-			(new UserProfile())->setUser($this->createUser(1)),
+			(new UserPreferences())->setUser($this->createUser(1)),
 			$this->createUser(2),
 			Voter::ACCESS_DENIED,
 			false,
@@ -211,7 +212,7 @@ class ProfileVoterTest extends TestCase implements Actionable
 		
 		yield 'owner can see' => [
 			self::VIEW,
-			(new UserProfile())->setUser($this->createUser(1)),
+			(new UserPreferences())->setUser($this->createUser(1)),
 			$this->createUser(1),
 			Voter::ACCESS_GRANTED,
 			false,
@@ -219,7 +220,7 @@ class ProfileVoterTest extends TestCase implements Actionable
 		
 		yield 'owner can edit' => [
 			self::EDIT,
-			(new UserProfile())->setUser($this->createUser(1)),
+			(new UserPreferences())->setUser($this->createUser(1)),
 			$this->createUser(1),
 			Voter::ACCESS_GRANTED,
 			false,
@@ -227,7 +228,7 @@ class ProfileVoterTest extends TestCase implements Actionable
 		
 		yield 'owner can delete' => [
 			self::DELETE,
-			(new UserProfile())->setUser($this->createUser(1)),
+			(new UserPreferences())->setUser($this->createUser(1)),
 			$this->createUser(1),
 			Voter::ACCESS_GRANTED,
 			false,
@@ -235,7 +236,7 @@ class ProfileVoterTest extends TestCase implements Actionable
 		
 		yield 'admin can see' => [
 			self::VIEW,
-			(new UserProfile())->setUser($this->createUser(1)),
+			(new UserPreferences())->setUser($this->createUser(1)),
 			$this->createAdmin(1),
 			Voter::ACCESS_GRANTED,
 			true,
@@ -243,7 +244,7 @@ class ProfileVoterTest extends TestCase implements Actionable
 		
 		yield 'admin can edit' => [
 			self::EDIT,
-			(new UserProfile())->setUser($this->createUser(1)),
+			(new UserPreferences())->setUser($this->createUser(1)),
 			$this->createAdmin(1),
 			Voter::ACCESS_GRANTED,
 			true,
@@ -251,7 +252,7 @@ class ProfileVoterTest extends TestCase implements Actionable
 		
 		yield 'admin can delete' => [
 			self::DELETE,
-			(new UserProfile())->setUser($this->createUser(1)),
+			(new UserPreferences())->setUser($this->createUser(1)),
 			$this->createAdmin(1),
 			Voter::ACCESS_GRANTED,
 			true,

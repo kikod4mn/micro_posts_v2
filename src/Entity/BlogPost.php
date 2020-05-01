@@ -5,13 +5,14 @@ declare(strict_types = 1);
 namespace App\Entity;
 
 use App\Entity\Abstracts\AbstractEntity;
-use App\Entity\Concerns\CanReport;
+use App\Entity\Concerns\IsPublishable;
+use App\Entity\Concerns\IsReportable;
+use App\Entity\Concerns\IsTrashable;
 use App\Entity\Concerns\CountsLikes;
 use App\Entity\Concerns\CountsViews;
 use App\Entity\Concerns\HasAuthor;
 use App\Entity\Concerns\HasSlug;
 use App\Entity\Concerns\HasTimestamps;
-use App\Entity\Concerns\CanPublish;
 use App\Entity\Concerns\HasUuid;
 use App\Entity\Contracts\Authorable;
 use App\Entity\Contracts\CountableLikes;
@@ -20,38 +21,48 @@ use App\Entity\Contracts\Publishable;
 use App\Entity\Contracts\Reportable;
 use App\Entity\Contracts\Sluggable;
 use App\Entity\Contracts\TimeStampable;
+use App\Entity\Contracts\Trashable;
 use App\Entity\Contracts\Uniqable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Table(name="`comment`")
+ * @ORM\Table(name="`blog_post`")
  * @UniqueEntity(fields="uuid", message="How did this happen???? Uuid should be unique!!")
- * @ORM\Entity(repositoryClass="App\Repository\CommentRepository")
+ * @UniqueEntity(fields="slug", message="How did this happen???? Slug should be unique!!")
+ * @ORM\Entity(repositoryClass="App\Repository\BlogPostRepository")
  */
-class Comment extends AbstractEntity
-	implements CountableViews, CountableLikes, Authorable, TimeStampable, Publishable, Reportable, Uniqable, Sluggable
+class BlogPost extends AbstractEntity
+	implements CountableLikes, CountableViews, TimeStampable, Authorable, Publishable, Reportable, Trashable, Uniqable, Sluggable
 {
-	use HasUuid, CountsLikes, CountsViews, HasAuthor, HasTimestamps, CanPublish, CanReport, HasSlug;
+	use HasUuid, CountsViews, CountsLikes, HasAuthor, HasTimestamps, IsPublishable, IsReportable, IsTrashable, HasSlug;
 	
 	/**
 	 * @var string
 	 */
-	const SLUGGABLE_FIELD = 'body';
+	const SLUGGABLE_FIELD = 'title';
 	
 	/**
-	 * @ORM\Column(type="string", length=2024)
+	 * @ORM\Column(type="string", length=255)
 	 * @Assert\NotBlank()
-	 * @Assert\Length(min="10", max="280", minMessage="Please enter a minimum of 10 characters!", maxMessage="No more than 280 characters allowed!")
+	 * @var string
+	 */
+	protected $title;
+	
+	/**
+	 * @Groups({"default"})
+	 * @ORM\Column(type="text")
+	 * @Assert\NotBlank()
 	 */
 	protected $body;
 	
 	/**
-	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="comments")
+	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="blogPosts")
 	 * @ORM\JoinColumn(nullable=false)
 	 * @ORM\OrderBy({"createdAt" = "DESC"})
 	 * @var Authorable
@@ -59,25 +70,30 @@ class Comment extends AbstractEntity
 	protected $author;
 	
 	/**
-	 * @ORM\ManyToOne(targetEntity="App\Entity\Post", inversedBy="comments")
-	 * @ORM\JoinTable(name="post_comments",
-	 *     joinColumns={
-	 *         @ORM\JoinColumn(name="post_id", referencedColumnName="id", nullable=false)
-	 *     },
-	 *     inverseJoinColumns={
-	 *         @ORM\JoinColumn(name="comment_id", referencedColumnName="id", nullable=false)
-	 *     }
-	 * )
-	 * @ORM\OrderBy({"createdAt" = "DESC"})
+	 * @ORM\ManyToMany(targetEntity="App\Entity\Picture", mappedBy="blogPost")
 	 * @var Collection
 	 */
-	protected $post;
+	protected $headerImage;
 	
 	/**
-	 * @ORM\ManyToMany(targetEntity="User", inversedBy="commentsLiked")
-	 * @ORM\JoinTable(name="comment_likes",
+	 * @ORM\OneToOne(targetEntity="App\Entity\Gallery", mappedBy="blogPost")
+	 * @var Collection
+	 */
+	protected $gallery;
+	
+	/**
+	 * @Groups({"default", "user-with-posts"})
+	 * @ORM\OneToMany(targetEntity="App\Entity\BlogComment", mappedBy="blogPost", cascade={"all"})
+	 * @var Collection
+	 */
+	protected $comments;
+	
+	/**
+	 * @Groups({"default", "user-with-posts"})
+	 * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="blogPostsLiked", cascade={"all"})
+	 * @ORM\JoinTable(name="blog_post_likes",
 	 *     joinColumns={
-	 *          @ORM\JoinColumn(name="comment_id", referencedColumnName="id", nullable=false)
+	 *          @ORM\JoinColumn(name="blog_post_id", referencedColumnName="id", nullable=false)
 	 *     },
 	 *     inverseJoinColumns={
 	 *          @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
@@ -88,24 +104,12 @@ class Comment extends AbstractEntity
 	protected $likedBy;
 	
 	/**
-	 * @ORM\Column(type="boolean", nullable=false)
-	 * @var bool
-	 */
-	protected $reported = false;
-	
-	/**
-	 * @ORM\Column(type="integer", nullable=false)
-	 * @var int
-	 */
-	protected $reportCount = 0;
-	
-	/**
-	 * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="reportedComments")
-	 * @ORM\JoinTable(name="reported_comments", joinColumns={
+	 * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="reportedBlogPosts")
+	 * @ORM\JoinTable(name="reported_blog_posts", joinColumns={
 	 *          @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
 	 *      },
 	 *      inverseJoinColumns={
-	 *          @ORM\JoinColumn(name="comment_id", referencedColumnName="id", nullable=false)
+	 *          @ORM\JoinColumn(name="blog_post_id", referencedColumnName="id", nullable=false)
 	 *      }
 	 * )
 	 * @var Collection
@@ -113,12 +117,13 @@ class Comment extends AbstractEntity
 	protected $reportedBy;
 	
 	/**
-	 * Comment constructor.
+	 * Post constructor.
 	 */
 	public function __construct()
 	{
-		$this->likedBy = new ArrayCollection();
-		$this->post    = new ArrayCollection();
+		$this->likedBy    = new ArrayCollection();
+		$this->reportedBy = new ArrayCollection();
+		$this->comments   = new ArrayCollection();
 	}
 	
 	/**
@@ -131,32 +136,27 @@ class Comment extends AbstractEntity
 	
 	/**
 	 * @param  string  $body
+	 * @return BlogPost
 	 */
-	public function setBody(string $body): void
+	public function setBody(string $body): self
 	{
 		$this->body = $this->cleanString($body);
+		
+		return $this;
 	}
 	
 	/**
 	 * @return null|Collection
 	 */
-	public function getPost()
+	public function getComments(): ?Collection
 	{
-		return $this->post;
-	}
-	
-	/**
-	 * @param  Post  $post
-	 */
-	public function setPost($post): void
-	{
-		$this->post = $post;
+		return $this->comments;
 	}
 	
 	/**
 	 * @return null|Collection
 	 */
-	public function getLikedBy()
+	public function getLikedBy(): ?Collection
 	{
 		return $this->likedBy;
 	}
@@ -190,5 +190,21 @@ class Comment extends AbstractEntity
 	public function likesCount(): ?int
 	{
 		return $this->likedBy->count();
+	}
+	
+	/**
+	 * @return string
+	 */
+	public function getTitle(): string
+	{
+		return $this->title;
+	}
+	
+	/**
+	 * @param  string  $title
+	 */
+	public function setTitle(string $title): void
+	{
+		$this->title = $title;
 	}
 }
