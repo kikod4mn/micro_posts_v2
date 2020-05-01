@@ -6,6 +6,7 @@ namespace App\Entity;
 
 use App\Entity\Concerns\HasUuid;
 use App\Entity\Contracts\Uniqable;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -21,13 +22,13 @@ class UserPreferences implements Uniqable
 	
 	/**
 	 * @ORM\OneToOne(targetEntity="App\Entity\User", mappedBy="preferences")
-	 * @var User
+	 * @var User|Collection
 	 */
 	protected $user;
 	
 	/**
 	 * @ORM\Column(type="string", length=4)
-	 * @Assert\Length(min="2", max="2")
+	 * @Assert\NotBlank()
 	 */
 	protected $locale;
 	
@@ -44,9 +45,9 @@ class UserPreferences implements Uniqable
 	protected $shouldReceiveEmailOnNewComments;
 	
 	/**
-	 * @return null|User
+	 * @return null|Collection|User
 	 */
-	public function getUser(): ?User
+	public function getUser(): ?Collection
 	{
 		return $this->user;
 	}

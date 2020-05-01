@@ -7,7 +7,8 @@ namespace App\Entity;
 use App\Entity\Abstracts\AbstractEntity;
 use App\Entity\Concerns\HasUuid;
 use App\Entity\Contracts\Uniqable;
-use DateTime;
+use DateTimeInterface;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
@@ -22,7 +23,7 @@ class UserProfile extends AbstractEntity implements Uniqable
 	
 	/**
 	 * @ORM\OneToOne(targetEntity="User", mappedBy="profile")
-	 * @var User
+	 * @var User|Collection
 	 */
 	protected $user;
 	
@@ -40,14 +41,14 @@ class UserProfile extends AbstractEntity implements Uniqable
 	
 	/**
 	 * @ORM\Column(type="date", nullable=true)
-	 * @var DateTime
+	 * @var DateTimeInterface
 	 */
 	protected $birthday;
 	
 	/**
-	 * @return User
+	 * @return null|Collection|User
 	 */
-	public function getUser(): ?User
+	public function getUser(): ?Collection
 	{
 		return $this->user;
 	}
@@ -102,18 +103,18 @@ class UserProfile extends AbstractEntity implements Uniqable
 	}
 	
 	/**
-	 * @return null|DateTime
+	 * @return null|DateTimeInterface
 	 */
-	public function getBirthday(): ?DateTime
+	public function getBirthday(): ?DateTimeInterface
 	{
 		return $this->birthday;
 	}
 	
 	/**
-	 * @param  DateTime  $birthday
+	 * @param  DateTimeInterface  $birthday
 	 * @return UserProfile
 	 */
-	public function setBirthday(DateTime $birthday): self
+	public function setBirthday(DateTimeInterface $birthday): self
 	{
 		$this->birthday = $birthday;
 		

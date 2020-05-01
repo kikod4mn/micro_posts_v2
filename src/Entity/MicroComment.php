@@ -21,7 +21,7 @@ class MicroComment extends BaseComment
 	/**
 	 * @ORM\ManyToOne(targetEntity="App\Entity\MicroPost", inversedBy="comments")
 	 * @ORM\OrderBy({"createdAt" = "DESC"})
-	 * @var Collection
+	 * @var MicroPost|Collection
 	 */
 	protected $microPost;
 	
@@ -29,7 +29,7 @@ class MicroComment extends BaseComment
 	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="microComments")
 	 * @ORM\JoinColumn(nullable=false)
 	 * @ORM\OrderBy({"createdAt" = "DESC"})
-	 * @var Authorable
+	 * @var Authorable|User|Collection
 	 */
 	protected $author;
 	
@@ -43,7 +43,7 @@ class MicroComment extends BaseComment
 	 *          @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
 	 *     }
 	 * )
-	 * @var Collection
+	 * @var User[]|Collection
 	 */
 	protected $likedBy;
 	
@@ -56,7 +56,7 @@ class MicroComment extends BaseComment
 	 *          @ORM\JoinColumn(name="comment_id", referencedColumnName="id", nullable=false)
 	 *      }
 	 * )
-	 * @var Collection
+	 * @var MicroComment[]|Collection
 	 */
 	protected $reportedBy;
 	
@@ -65,15 +65,17 @@ class MicroComment extends BaseComment
 	 */
 	public function __construct()
 	{
+		$this->microPost  = new ArrayCollection();
+		$this->author     = new ArrayCollection();
 		$this->likedBy    = new ArrayCollection();
 		$this->microPost  = new ArrayCollection();
 		$this->reportedBy = new ArrayCollection();
 	}
 	
 	/**
-	 * @return null|Collection
+	 * @return null|Collection|MicroPost
 	 */
-	public function getMicroPost()
+	public function getMicroPost(): ?Collection
 	{
 		return $this->microPost;
 	}

@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace App\Entity;
 
 use App\Entity\Abstracts\AbstractEntity;
+use App\Entity\Concerns\IsLikable;
 use App\Entity\Concerns\IsReportable;
 use App\Entity\Concerns\CountsLikes;
 use App\Entity\Concerns\CountsViews;
@@ -27,9 +28,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Table(name="`micro_post`")
@@ -40,7 +38,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class MicroPost extends AbstractEntity
 	implements CountableLikes, CountableViews, TimeStampable, Authorable, Publishable, Reportable, Trashable, Uniqable, Sluggable
 {
-	use HasUuid, CountsViews, CountsLikes, HasAuthor, HasTimestamps, IsPublishable, IsReportable, IsTrashable, HasSlug;
+	use HasUuid, CountsViews, CountsLikes, HasAuthor, HasTimestamps, IsPublishable, IsReportable, IsTrashable, HasSlug, IsLikable;
 	
 	/**
 	 * @var string
@@ -48,10 +46,8 @@ class MicroPost extends AbstractEntity
 	const SLUGGABLE_FIELD = 'body';
 	
 	/**
-	 * @Groups({"default"})
-	 * @ORM\Column(type="text")
-	 * @Assert\NotBlank()
-	 * @Assert\Length(min="10", max="280", minMessage="Please enter a minimum of 10 characters!", maxMessage="No more than 280 characters allowed!")
+	 * @ORM\Column(type="text", length=240, nullable=false)
+	 * @var string
 	 */
 	protected $body;
 	
@@ -59,12 +55,11 @@ class MicroPost extends AbstractEntity
 	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="microPosts")
 	 * @ORM\JoinColumn(nullable=false)
 	 * @ORM\OrderBy({"createdAt" = "DESC"})
-	 * @var Authorable
+	 * @var Authorable|User|Collection
 	 */
 	protected $author;
 	
 	/**
-	 * @Groups({"default", "user-with-posts"})
 	 * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="microPostsLiked", cascade={"all"})
 	 * @ORM\JoinTable(name="micro_post_likes",
 	 *     joinColumns={
@@ -74,14 +69,13 @@ class MicroPost extends AbstractEntity
 	 *          @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
 	 *     }
 	 * )
-	 * @var Collection
+	 * @var User[]|Collection
 	 */
 	protected $likedBy;
 	
 	/**
-	 * @Groups({"default", "user-with-posts"})
 	 * @ORM\OneToMany(targetEntity="App\Entity\MicroComment", mappedBy="microPost", cascade={"all"})
-	 * @var Collection
+	 * @var MicroComment[]|Collection
 	 */
 	protected $comments;
 	
@@ -94,7 +88,7 @@ class MicroPost extends AbstractEntity
 	 *          @ORM\JoinColumn(name="micro_post_id", referencedColumnName="id", nullable=false)
 	 *      }
 	 * )
-	 * @var Collection
+	 * @var User[]|Collection
 	 */
 	protected $reportedBy;
 	
@@ -103,8 +97,10 @@ class MicroPost extends AbstractEntity
 	 */
 	public function __construct()
 	{
-		$this->likedBy  = new ArrayCollection();
-		$this->comments = new ArrayCollection();
+		$this->author     = new ArrayCollection();
+		$this->likedBy    = new ArrayCollection();
+		$this->comments   = new ArrayCollection();
+		$this->reportedBy = new ArrayCollection();
 	}
 	
 	/**
@@ -127,49 +123,10 @@ class MicroPost extends AbstractEntity
 	}
 	
 	/**
-	 * @return null|Collection
+	 * @return null|Collection|MicroComment[]
 	 */
 	public function getComments(): ?Collection
 	{
 		return $this->comments;
-	}
-	
-	/**
-	 * @return null|Collection
-	 */
-	public function getLikedBy(): ?Collection
-	{
-		return $this->likedBy;
-	}
-	
-	/**
-	 * Like a post if not already liked.
-	 * @param  UserInterface  $user
-	 */
-	public function like(UserInterface $user): void
-	{
-		if (! $this->likedBy->contains($user)) {
-			$this->likedBy->add($user);
-		}
-	}
-	
-	/**
-	 * Dislike a post if previously liked.
-	 * @param  UserInterface  $user
-	 */
-	public function unlike(UserInterface $user): void
-	{
-		if ($this->likedBy->contains($user)) {
-			$this->likedBy->removeElement($user);
-		}
-	}
-	
-	/**
-	 * Helper to get quick like count for a comment.
-	 * @return int
-	 */
-	public function likesCount(): ?int
-	{
-		return $this->likedBy->count();
 	}
 }

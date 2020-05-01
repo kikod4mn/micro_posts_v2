@@ -37,7 +37,7 @@ class User extends AbstractEntity implements UserInterface, TimeStampable, Trash
 	/**
 	 * @var string
 	 */
-	const SLUGGABLE_FIELD = 'username';
+	const SLUGGABLE_FIELD = 'fullname';
 	
 	/** @var string */
 	public const ROLE_USER = 'ROLE_USER';
@@ -52,36 +52,26 @@ class User extends AbstractEntity implements UserInterface, TimeStampable, Trash
 	public const ROLE_SUPER_ADMINISTRATOR = 'ROLE_SUPER_ADMINISTRATOR';
 	
 	/**
-	 * @Groups({"default", "administer", "user-with-posts", "user-with-comments", "user-with-followers", "user-with-following"})
-	 * @ORM\Column(type="string", length=50, unique=true)
+	 * @ORM\Column(type="string", length=255, unique=true)
 	 * @Assert\NotBlank()
-	 * @Assert\Length(min="4", max="50", minMessage="At least 4 characters required for username", maxMessage="Maximum length
-	 *     for username is 50 characters")
 	 * @var string
 	 */
 	protected $username;
 	
 	/**
-	 * @ORM\Column(type="string")
+	 * @ORM\Column(type="string", nullable=false)
 	 * @var string
 	 */
 	protected $password;
 	
 	/**
 	 * @Assert\NotBlank()
-	 * @Assert\Length(
-	 *          min="8",
-	 *          max="4096",
-	 *          minMessage="The password should be at least 8 characters long",
-	 *          groups={"Default"}
-	 * )
 	 * @var string
 	 */
 	protected $plainPassword;
 	
 	/**
-	 * @Groups({"administer"})
-	 * @ORM\Column(type="string", length=254, unique=true)
+	 * @ORM\Column(type="string", length=255, unique=true)
 	 * @Assert\NotBlank()
 	 * @Assert\Email()
 	 * @var string
@@ -89,31 +79,25 @@ class User extends AbstractEntity implements UserInterface, TimeStampable, Trash
 	protected $email;
 	
 	/**
-	 * @Groups({"default", "administer", "user-with-posts", "user-with-comments", "user-with-followers", "user-with-following"})
-	 * @ORM\Column(type="string", length=150)
+	 * @ORM\Column(type="string", length=255)
 	 * @Assert\NotBlank()
-	 * @Assert\Length(min="4", max="100", minMessage="Atleast 4 characters required for full name", maxMessage="Maximum length
-	 *     for full name is 100 characters")
 	 * @var string
 	 */
 	protected $fullname;
 	
 	/**
-	 * @Groups({"administer"})
 	 * @ORM\Column(type="string", nullable=false)
 	 * @var string
 	 */
 	protected $role = self::ROLE_USER;
 	
 	/**
-	 * @Groups({"administer", "user-with-followers"})
 	 * @ORM\ManyToMany(targetEntity="User", mappedBy="following")
-	 * @var Collection
+	 * @var User[]|Collection
 	 */
 	protected $followers;
 	
 	/**
-	 * @Groups({"administer", "user-with-following"})
 	 * @ORM\ManyToMany(targetEntity="User", inversedBy="followers")
 	 * @ORM\JoinTable(name="following", joinColumns={
 	 *          @ORM\JoinColumn(name="user_id", referencedColumnName="id")
@@ -122,25 +106,29 @@ class User extends AbstractEntity implements UserInterface, TimeStampable, Trash
 	 *          @ORM\JoinColumn(name="following_user_id", referencedColumnName="id")
 	 *      }
 	 * )
-	 * * @var Collection
+	 * @var User[]|Collection
 	 */
 	protected $following;
 	
 	/**
-	 * @Groups({"for-self"})
 	 * @ORM\OneToMany(targetEntity="App\Entity\Notification", mappedBy="author")
-	 * @var Collection
+	 * @var Notification[]|Collection
 	 */
 	protected $notifications;
 	
 	/**
-	 * @ORM\Column(type="string", nullable=true, length=64)
-	 * @var string
+	 * @ORM\OneToMany(targetEntity="App\Entity\Picture", mappedBy="author")
+	 * @var Picture[]|Collection
 	 */
-	protected $confirmationToken;
+	protected $pictures;
 	
 	/**
-	 * @Groups({"administer"})
+	 * @ORM\OneToMany(targetEntity="App\Entity\Gallery", mappedBy="author")
+	 * @var Gallery[]|Collection
+	 */
+	protected $galleries;
+	
+	/**
 	 * @ORM\Column(type="boolean", nullable=false)
 	 * @var bool
 	 */
@@ -150,21 +138,13 @@ class User extends AbstractEntity implements UserInterface, TimeStampable, Trash
 	 * @ORM\Column(type="string", nullable=true, length=64)
 	 * @var string
 	 */
+	protected $accountConfirmationToken;
+	
+	/**
+	 * @ORM\Column(type="string", nullable=true, length=64)
+	 * @var string
+	 */
 	protected $passwordResetToken;
-	
-	/**
-	 * @Groups({"administer"})
-	 * @ORM\OneToOne(targetEntity="App\Entity\UserPreferences", inversedBy="user", cascade={"all"})
-	 * @var UserPreferences
-	 */
-	protected $preferences;
-	
-	/**
-	 * @Groups({"administer", "user-with-posts", "user-with-comments", "user-with-followers", "user-with-following"})
-	 * @ORM\OneToOne(targetEntity="App\Entity\UserProfile", inversedBy="user", cascade={"all"})
-	 * @var UserProfile
-	 */
-	protected $profile;
 	
 	/**
 	 * @Groups({"administer"})
@@ -172,6 +152,19 @@ class User extends AbstractEntity implements UserInterface, TimeStampable, Trash
 	 * @var boolean
 	 */
 	protected $forcedPasswordChange = false;
+	
+	/**
+	 * @ORM\OneToOne(targetEntity="App\Entity\UserPreferences", inversedBy="user", cascade={"all"})
+	 * @var UserPreferences|Collection
+	 */
+	protected $preferences;
+	
+	/**
+	 * @Groups({"administer", "user-with-posts", "user-with-comments", "user-with-followers", "user-with-following"})
+	 * @ORM\OneToOne(targetEntity="App\Entity\UserProfile", inversedBy="user", cascade={"all"})
+	 * @var UserProfile|Collection
+	 */
+	protected $profile;
 	
 	/**
 	 * User constructor.
@@ -189,6 +182,12 @@ class User extends AbstractEntity implements UserInterface, TimeStampable, Trash
 		$this->microCommentsLiked    = new ArrayCollection();
 		$this->reportedMicroPosts    = new ArrayCollection();
 		$this->reportedMicroComments = new ArrayCollection();
+		
+		$this->notifications = new ArrayCollection();
+		$this->pictures      = new ArrayCollection();
+		$this->galleries     = new ArrayCollection();
+		$this->followers     = new ArrayCollection();
+		$this->following     = new ArrayCollection();
 	}
 	
 	/**
@@ -324,11 +323,19 @@ class User extends AbstractEntity implements UserInterface, TimeStampable, Trash
 	}
 	
 	/**
-	 * @return null|Collection
+	 * @return null|Collection|User[]
 	 */
 	public function getFollowers(): ?Collection
 	{
 		return $this->followers;
+	}
+	
+	/**
+	 * @return null|Collection|User[]
+	 */
+	public function getFollowing(): ?Collection
+	{
+		return $this->following;
 	}
 	
 	/**
@@ -364,38 +371,11 @@ class User extends AbstractEntity implements UserInterface, TimeStampable, Trash
 	}
 	
 	/**
-	 * @return null|Collection
-	 */
-	public function getFollowing(): ?Collection
-	{
-		return $this->following;
-	}
-	
-	/**
-	 * @return null|Collection
+	 * @return null|Collection|Notification[]
 	 */
 	public function getNotifications(): ?Collection
 	{
 		return $this->notifications;
-	}
-	
-	/**
-	 * @return string
-	 */
-	public function getConfirmationToken(): ?string
-	{
-		return $this->confirmationToken;
-	}
-	
-	/**
-	 * @param  null|string  $confirmationToken
-	 * @return User
-	 */
-	public function setConfirmationToken(?string $confirmationToken): self
-	{
-		$this->confirmationToken = $confirmationToken;
-		
-		return $this;
 	}
 	
 	/**
@@ -423,6 +403,25 @@ class User extends AbstractEntity implements UserInterface, TimeStampable, Trash
 	}
 	
 	/**
+	 * @return string
+	 */
+	public function getAccountConfirmationToken(): ?string
+	{
+		return $this->accountConfirmationToken;
+	}
+	
+	/**
+	 * @param  null|string  $accountConfirmationToken
+	 * @return User
+	 */
+	public function setAccountConfirmationToken(?string $accountConfirmationToken): self
+	{
+		$this->accountConfirmationToken = $accountConfirmationToken;
+		
+		return $this;
+	}
+	
+	/**
 	 * @return null|string
 	 */
 	public function getPasswordResetToken(): ?string
@@ -442,9 +441,28 @@ class User extends AbstractEntity implements UserInterface, TimeStampable, Trash
 	}
 	
 	/**
-	 * @return null|UserPreferences
+	 * @return null|bool
 	 */
-	public function getPreferences(): ?UserPreferences
+	public function getForcedPasswordChange(): ?bool
+	{
+		return $this->forcedPasswordChange;
+	}
+	
+	/**
+	 * @param  bool  $forcedPasswordChange
+	 * @return User
+	 */
+	public function setForcedPasswordChange(bool $forcedPasswordChange): self
+	{
+		$this->forcedPasswordChange = $forcedPasswordChange;
+		
+		return $this;
+	}
+	
+	/**
+	 * @return null|Collection|UserPreferences
+	 */
+	public function getPreferences(): ?Collection
 	{
 		return $this->preferences;
 	}
@@ -461,9 +479,9 @@ class User extends AbstractEntity implements UserInterface, TimeStampable, Trash
 	}
 	
 	/**
-	 * @return null|UserProfile
+	 * @return null|Collection|UserProfile
 	 */
-	public function getProfile(): ?UserProfile
+	public function getProfile(): ?Collection
 	{
 		return $this->profile;
 	}
@@ -475,25 +493,6 @@ class User extends AbstractEntity implements UserInterface, TimeStampable, Trash
 	public function setProfile(UserProfile $profile): self
 	{
 		$this->profile = $profile;
-		
-		return $this;
-	}
-	
-	/**
-	 * @return null|bool
-	 */
-	public function getForcedPasswordChange(): ?bool
-	{
-		return $this->forcedPasswordChange;
-	}
-	
-	/**
-	 * @param  bool  $forcedPasswordChange
-	 * @return User
-	 */
-	public function setForcedPasswordChange(bool $forcedPasswordChange): self
-	{
-		$this->forcedPasswordChange = $forcedPasswordChange;
 		
 		return $this;
 	}

@@ -6,13 +6,14 @@ namespace App\Entity\Concerns;
 
 use App\Entity\Contracts\Authorable;
 use App\Entity\User;
+use Doctrine\Common\Collections\Collection;
 
 trait HasAuthor
 {
 	/**
-	 * @return null|Authorable
+	 * @return null|Authorable|User|Collection
 	 */
-	public function getAuthor()
+	public function getAuthor(): ?Authorable
 	{
 		return $this->author;
 	}

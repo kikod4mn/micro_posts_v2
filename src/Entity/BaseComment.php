@@ -72,9 +72,12 @@ abstract class BaseComment extends AbstractEntity
 	
 	/**
 	 * @param  string  $body
+	 * @return BaseComment
 	 */
-	public function setBody(string $body): void
+	public function setBody(string $body): self
 	{
 		$this->body = $this->cleanString($body);
+		
+		return $this;
 	}
 }

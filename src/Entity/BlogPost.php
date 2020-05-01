@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace App\Entity;
 
 use App\Entity\Abstracts\AbstractEntity;
+use App\Entity\Concerns\IsLikable;
 use App\Entity\Concerns\IsPublishable;
 use App\Entity\Concerns\IsReportable;
 use App\Entity\Concerns\IsTrashable;
@@ -40,7 +41,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class BlogPost extends AbstractEntity
 	implements CountableLikes, CountableViews, TimeStampable, Authorable, Publishable, Reportable, Trashable, Uniqable, Sluggable
 {
-	use HasUuid, CountsViews, CountsLikes, HasAuthor, HasTimestamps, IsPublishable, IsReportable, IsTrashable, HasSlug;
+	use HasUuid, CountsViews, CountsLikes, HasAuthor, HasTimestamps, IsPublishable, IsReportable, IsTrashable, HasSlug, IsLikable;
 	
 	/**
 	 * @var string
@@ -48,15 +49,13 @@ class BlogPost extends AbstractEntity
 	const SLUGGABLE_FIELD = 'title';
 	
 	/**
-	 * @ORM\Column(type="string", length=255)
-	 * @Assert\NotBlank()
+	 * @ORM\Column(type="string", length=255, nullable=false)
 	 * @var string
 	 */
 	protected $title;
 	
 	/**
-	 * @Groups({"default"})
-	 * @ORM\Column(type="text")
+	 * @ORM\Column(type="text", nullable=false)
 	 * @Assert\NotBlank()
 	 */
 	protected $body;
@@ -65,31 +64,30 @@ class BlogPost extends AbstractEntity
 	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="blogPosts")
 	 * @ORM\JoinColumn(nullable=false)
 	 * @ORM\OrderBy({"createdAt" = "DESC"})
-	 * @var Authorable
+	 * @var Authorable|User|Collection
 	 */
 	protected $author;
 	
 	/**
 	 * @ORM\ManyToMany(targetEntity="App\Entity\Picture", mappedBy="blogPost")
-	 * @var Collection
+	 * @ORM\JoinColumn(nullable=false)
+	 * @var Picture|Collection
 	 */
 	protected $headerImage;
 	
 	/**
-	 * @ORM\OneToOne(targetEntity="App\Entity\Gallery", mappedBy="blogPost")
-	 * @var Collection
+	 * @ORM\OneToOne(targetEntity="App\Entity\Gallery", inversedBy="blogPost")
+	 * @var Gallery|Collection
 	 */
 	protected $gallery;
 	
 	/**
-	 * @Groups({"default", "user-with-posts"})
 	 * @ORM\OneToMany(targetEntity="App\Entity\BlogComment", mappedBy="blogPost", cascade={"all"})
-	 * @var Collection
+	 * @var BlogComment[]|Collection
 	 */
 	protected $comments;
 	
 	/**
-	 * @Groups({"default", "user-with-posts"})
 	 * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="blogPostsLiked", cascade={"all"})
 	 * @ORM\JoinTable(name="blog_post_likes",
 	 *     joinColumns={
@@ -99,7 +97,7 @@ class BlogPost extends AbstractEntity
 	 *          @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
 	 *     }
 	 * )
-	 * @var Collection
+	 * @var User[]|Collection
 	 */
 	protected $likedBy;
 	
@@ -112,7 +110,7 @@ class BlogPost extends AbstractEntity
 	 *          @ORM\JoinColumn(name="blog_post_id", referencedColumnName="id", nullable=false)
 	 *      }
 	 * )
-	 * @var Collection
+	 * @var User[]|Collection
 	 */
 	protected $reportedBy;
 	
@@ -121,9 +119,12 @@ class BlogPost extends AbstractEntity
 	 */
 	public function __construct()
 	{
-		$this->likedBy    = new ArrayCollection();
-		$this->reportedBy = new ArrayCollection();
-		$this->comments   = new ArrayCollection();
+		$this->author      = new ArrayCollection();
+		$this->headerImage = new ArrayCollection();
+		$this->gallery     = new ArrayCollection();
+		$this->comments    = new ArrayCollection();
+		$this->likedBy     = new ArrayCollection();
+		$this->reportedBy  = new ArrayCollection();
 	}
 	
 	/**
@@ -146,50 +147,11 @@ class BlogPost extends AbstractEntity
 	}
 	
 	/**
-	 * @return null|Collection
+	 * @return null|Collection|BlogComment[]
 	 */
 	public function getComments(): ?Collection
 	{
 		return $this->comments;
-	}
-	
-	/**
-	 * @return null|Collection
-	 */
-	public function getLikedBy(): ?Collection
-	{
-		return $this->likedBy;
-	}
-	
-	/**
-	 * Like a post if not already liked.
-	 * @param  UserInterface  $user
-	 */
-	public function like(UserInterface $user): void
-	{
-		if (! $this->likedBy->contains($user)) {
-			$this->likedBy->add($user);
-		}
-	}
-	
-	/**
-	 * Dislike a post if previously liked.
-	 * @param  UserInterface  $user
-	 */
-	public function unlike(UserInterface $user): void
-	{
-		if ($this->likedBy->contains($user)) {
-			$this->likedBy->removeElement($user);
-		}
-	}
-	
-	/**
-	 * Helper to get quick like count for a comment.
-	 * @return int
-	 */
-	public function likesCount(): ?int
-	{
-		return $this->likedBy->count();
 	}
 	
 	/**

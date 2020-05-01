@@ -11,6 +11,7 @@ use App\Entity\Concerns\HasUuid;
 use App\Entity\Contracts\Authorable;
 use App\Entity\Contracts\TimeStampable;
 use App\Entity\Contracts\Uniqable;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
@@ -33,7 +34,7 @@ class Notification extends AbstractEntity implements Authorable, TimeStampable, 
 	 * NOTE : In notification context, author means the user it is generated for.
 	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="notifications")
 	 * @ORM\JoinColumn(nullable=false)
-	 * @var Authorable
+	 * @var Authorable|User|Collection
 	 */
 	protected $author;
 	

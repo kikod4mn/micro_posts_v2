@@ -20,8 +20,9 @@ class BlogComment extends BaseComment
 {
 	/**
 	 * @ORM\ManyToOne(targetEntity="App\Entity\BlogPost", inversedBy="comments")
+	 * @ORM\JoinColumn(nullable=false)
 	 * @ORM\OrderBy({"createdAt" = "DESC"})
-	 * @var Collection
+	 * @var BlogPost|Collection
 	 */
 	protected $blogPost;
 	
@@ -29,7 +30,7 @@ class BlogComment extends BaseComment
 	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="blogComments")
 	 * @ORM\JoinColumn(nullable=false)
 	 * @ORM\OrderBy({"createdAt" = "DESC"})
-	 * @var Authorable
+	 * @var Authorable|User|Collection
 	 */
 	protected $author;
 	
@@ -43,7 +44,7 @@ class BlogComment extends BaseComment
 	 *          @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
 	 *     }
 	 * )
-	 * @var Collection
+	 * @var User[]|Collection
 	 */
 	protected $likedBy;
 	
@@ -56,7 +57,7 @@ class BlogComment extends BaseComment
 	 *          @ORM\JoinColumn(name="comment_id", referencedColumnName="id", nullable=false)
 	 *      }
 	 * )
-	 * @var Collection
+	 * @var User[]|Collection
 	 */
 	protected $reportedBy;
 	
@@ -65,24 +66,29 @@ class BlogComment extends BaseComment
 	 */
 	public function __construct()
 	{
+		$this->blogPost   = new ArrayCollection();
+		$this->author     = new ArrayCollection();
 		$this->likedBy    = new ArrayCollection();
 		$this->blogPost   = new ArrayCollection();
 		$this->reportedBy = new ArrayCollection();
 	}
 	
 	/**
-	 * @return null|Collection
+	 * @return null|Collection|BlogPost
 	 */
-	public function getBlogPost()
+	public function getBlogPost(): ?Collection
 	{
 		return $this->blogPost;
 	}
 	
 	/**
 	 * @param  BlogPost  $blogPost
+	 * @return BlogComment
 	 */
-	public function setBlogPost(BlogPost $blogPost): void
+	public function setBlogPost(BlogPost $blogPost): self
 	{
 		$this->blogPost = $blogPost;
+		
+		return $this;
 	}
 }

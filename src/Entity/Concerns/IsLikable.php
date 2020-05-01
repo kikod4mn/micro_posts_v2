@@ -4,13 +4,13 @@ declare(strict_types = 1);
 
 namespace App\Entity\Concerns;
 
+use App\Entity\User;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 trait IsLikable
 {
 	/**
-	 * @return null|Collection
+	 * @return null|Collection|User[]
 	 */
 	public function getLikedBy()
 	{
@@ -19,9 +19,9 @@ trait IsLikable
 	
 	/**
 	 * Like a post if not already liked.
-	 * @param  UserInterface  $user
+	 * @param  User  $user
 	 */
-	public function like(UserInterface $user): void
+	public function like(User $user): void
 	{
 		if (! $this->likedBy->contains($user)) {
 			$this->likedBy->add($user);
@@ -30,9 +30,9 @@ trait IsLikable
 	
 	/**
 	 * Dislike a post if previously liked.
-	 * @param  UserInterface  $user
+	 * @param  User  $user
 	 */
-	public function unlike(UserInterface $user): void
+	public function unlike(User $user): void
 	{
 		if ($this->likedBy->contains($user)) {
 			$this->likedBy->removeElement($user);
