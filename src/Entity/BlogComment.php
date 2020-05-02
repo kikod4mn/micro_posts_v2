@@ -22,7 +22,7 @@ class BlogComment extends BaseComment
 	 * @ORM\ManyToOne(targetEntity="App\Entity\BlogPost", inversedBy="comments")
 	 * @ORM\JoinColumn(nullable=false)
 	 * @ORM\OrderBy({"createdAt" = "DESC"})
-	 * @var BlogPost|Collection
+	 * @var BlogPost
 	 */
 	protected $blogPost;
 	
@@ -30,7 +30,7 @@ class BlogComment extends BaseComment
 	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="blogComments")
 	 * @ORM\JoinColumn(nullable=false)
 	 * @ORM\OrderBy({"createdAt" = "DESC"})
-	 * @var Authorable|User|Collection
+	 * @var Authorable|User
 	 */
 	protected $author;
 	
@@ -66,8 +66,6 @@ class BlogComment extends BaseComment
 	 */
 	public function __construct()
 	{
-		$this->blogPost   = new ArrayCollection();
-		$this->author     = new ArrayCollection();
 		$this->likedBy    = new ArrayCollection();
 		$this->blogPost   = new ArrayCollection();
 		$this->reportedBy = new ArrayCollection();

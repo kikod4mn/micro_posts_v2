@@ -74,11 +74,12 @@ abstract class AbstractEntity implements Arrayable, Jsonable, JsonSerializable, 
 	}
 	
 	/**
+	 * NOTE : Group default is always included for fields in traits that are commonly needed across entities and different ways of display.
+	 * @param  array|string[]  $groups  Normalization context groups
 	 * @param  int              $options
-	 * @param  string|string[]  $groups  Normalization context groups
 	 * @return string
 	 */
-	public function toJson(int $options = 0, $groups = 'default'): string
+	public function toJson(array $groups = [], int $options = 0): string
 	{
 		return json_encode($this->toArray($groups), $options);
 	}

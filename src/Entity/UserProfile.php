@@ -23,7 +23,7 @@ class UserProfile extends AbstractEntity implements Uniqable
 	
 	/**
 	 * @ORM\OneToOne(targetEntity="User", mappedBy="profile")
-	 * @var User|Collection
+	 * @var User
 	 */
 	protected $user;
 	

@@ -21,7 +21,7 @@ class MicroComment extends BaseComment
 	/**
 	 * @ORM\ManyToOne(targetEntity="App\Entity\MicroPost", inversedBy="comments")
 	 * @ORM\OrderBy({"createdAt" = "DESC"})
-	 * @var MicroPost|Collection
+	 * @var MicroPost
 	 */
 	protected $microPost;
 	
@@ -29,7 +29,7 @@ class MicroComment extends BaseComment
 	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="microComments")
 	 * @ORM\JoinColumn(nullable=false)
 	 * @ORM\OrderBy({"createdAt" = "DESC"})
-	 * @var Authorable|User|Collection
+	 * @var Authorable|User
 	 */
 	protected $author;
 	
@@ -65,10 +65,7 @@ class MicroComment extends BaseComment
 	 */
 	public function __construct()
 	{
-		$this->microPost  = new ArrayCollection();
-		$this->author     = new ArrayCollection();
 		$this->likedBy    = new ArrayCollection();
-		$this->microPost  = new ArrayCollection();
 		$this->reportedBy = new ArrayCollection();
 	}
 	

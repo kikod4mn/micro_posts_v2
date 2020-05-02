@@ -41,4 +41,10 @@ interface TimeStampable
 	 * @return $this|TimeStampable
 	 */
 	public function setUpdatedTimestamps(): TimeStampable;
+	
+	/**
+	 * Determine if the entity is using timestamps.
+	 * @return bool
+	 */
+	public function hasTimestamps(): bool;
 }

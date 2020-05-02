@@ -10,13 +10,13 @@ trait CountsLikes
 	 * @ORM\Column(type="bigint", nullable=false)
 	 * @var int
 	 */
-	private $likeCount = 0;
+	protected $likeCount = 0;
 	
 	/**
 	 * @ORM\Column(type="bigint", nullable=false)
 	 * @var int
 	 */
-	private $weeklyLikeCount = 0;
+	protected $weeklyLikeCount = 0;
 	
 	/**
 	 * @return null|int

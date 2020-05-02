@@ -15,6 +15,7 @@ use App\Entity\Contracts\Sluggable;
 use App\Entity\Contracts\TimeStampable;
 use App\Entity\Contracts\Trashable;
 use App\Entity\Contracts\Uniqable;
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -52,6 +53,7 @@ class User extends AbstractEntity implements UserInterface, TimeStampable, Trash
 	public const ROLE_SUPER_ADMINISTRATOR = 'ROLE_SUPER_ADMINISTRATOR';
 	
 	/**
+	 * @Groups("default")
 	 * @ORM\Column(type="string", length=255, unique=true)
 	 * @Assert\NotBlank()
 	 * @var string
@@ -79,6 +81,7 @@ class User extends AbstractEntity implements UserInterface, TimeStampable, Trash
 	protected $email;
 	
 	/**
+	 * @Groups("default")
 	 * @ORM\Column(type="string", length=255)
 	 * @Assert\NotBlank()
 	 * @var string
@@ -147,7 +150,6 @@ class User extends AbstractEntity implements UserInterface, TimeStampable, Trash
 	protected $passwordResetToken;
 	
 	/**
-	 * @Groups({"administer"})
 	 * @ORM\Column(type="boolean", nullable=false)
 	 * @var boolean
 	 */
@@ -160,11 +162,24 @@ class User extends AbstractEntity implements UserInterface, TimeStampable, Trash
 	protected $preferences;
 	
 	/**
-	 * @Groups({"administer", "user-with-posts", "user-with-comments", "user-with-followers", "user-with-following"})
 	 * @ORM\OneToOne(targetEntity="App\Entity\UserProfile", inversedBy="user", cascade={"all"})
 	 * @var UserProfile|Collection
 	 */
 	protected $profile;
+	
+	/**
+	 * @Groups({"admin-test"})
+	 * @ORM\Column(type="datetime")
+	 * @var DateTime
+	 */
+	protected $createdAt;
+	
+	/**
+	 * @Groups({"admin-test"})
+	 * @ORM\Column(type="datetime", nullable=true)
+	 * @var DateTime
+	 */
+	protected $updatedAt;
 	
 	/**
 	 * User constructor.

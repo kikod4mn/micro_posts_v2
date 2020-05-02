@@ -12,9 +12,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 trait HasUuid
 {
 	/**
-	 * @Groups(
-	 *     {"default", "administer", "user-with-posts", "user-with-comments", "user-with-followers", "user-with-following"}
-	 *     )
+	 * @Groups({"default"})
 	 * @ORM\Id()
 	 * @ORM\Column(type="bigint", options={"unsigned": true})
 	 * @ORM\GeneratedValue()
@@ -23,9 +21,7 @@ trait HasUuid
 	protected $id;
 	
 	/**
-	 * @Groups(
-	 *     {"default", "administer", "user-with-posts", "user-with-comments", "user-with-followers", "user-with-following"}
-	 *     )
+	 * @Groups({"default"})
 	 * @ORM\Column(type="uuid", unique=true)
 	 * @var UuidInterface
 	 */

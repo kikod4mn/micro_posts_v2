@@ -12,7 +12,7 @@ interface Authorable
 	/**
 	 * @return null|Authorable|User|Collection
 	 */
-	public function getAuthor(): ?Authorable;
+	public function getAuthor();
 	
 	/**
 	 * @param  User  $author

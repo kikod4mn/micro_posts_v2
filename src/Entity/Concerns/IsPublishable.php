@@ -5,6 +5,9 @@ declare(strict_types = 1);
 namespace App\Entity\Concerns;
 
 use App\Entity\Contracts\Publishable;
+use DateTime;
+use DateTimeInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 trait IsPublishable
 {
@@ -13,6 +16,13 @@ trait IsPublishable
 	 * @var bool
 	 */
 	protected $published = false;
+	
+	/**
+	 * @Groups({"default"})
+	 * @ORM\Column(type="datetime", nullable=true)
+	 * @var DateTime
+	 */
+	protected $publishedAt;
 	
 	/**
 	 * @return bool
@@ -42,5 +52,24 @@ trait IsPublishable
 		$this->published = false;
 		
 		return $this;
+	}
+	
+	/**
+	 * @param  DateTimeInterface  $publishedAt
+	 * @return $this|Publishable
+	 */
+	public function setPublishedAt(DateTimeInterface $publishedAt): Publishable
+	{
+		$this->publishedAt = $publishedAt;
+		
+		return $this;
+	}
+	
+	/**
+	 * @return null|DateTimeInterface
+	 */
+	public function getPublishedAt(): ?DateTimeInterface
+	{
+		return $this->publishedAt;
 	}
 }

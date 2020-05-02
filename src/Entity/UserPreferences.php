@@ -22,7 +22,7 @@ class UserPreferences implements Uniqable
 	
 	/**
 	 * @ORM\OneToOne(targetEntity="App\Entity\User", mappedBy="preferences")
-	 * @var User|Collection
+	 * @var User
 	 */
 	protected $user;
 	

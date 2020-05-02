@@ -28,6 +28,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Table(name="`micro_post`")
@@ -46,16 +47,22 @@ class MicroPost extends AbstractEntity
 	const SLUGGABLE_FIELD = 'body';
 	
 	/**
+	 * @Groups(
+	 *     {"default", "post-list", "post-with-comments"}
+	 *     )
 	 * @ORM\Column(type="text", length=240, nullable=false)
 	 * @var string
 	 */
 	protected $body;
 	
 	/**
+	 * @Groups(
+	 *     {"default", "post-list", "post-with-comments"}
+	 *     )
 	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="microPosts")
 	 * @ORM\JoinColumn(nullable=false)
 	 * @ORM\OrderBy({"createdAt" = "DESC"})
-	 * @var Authorable|User|Collection
+	 * @var Authorable|User
 	 */
 	protected $author;
 	
@@ -97,7 +104,6 @@ class MicroPost extends AbstractEntity
 	 */
 	public function __construct()
 	{
-		$this->author     = new ArrayCollection();
 		$this->likedBy    = new ArrayCollection();
 		$this->comments   = new ArrayCollection();
 		$this->reportedBy = new ArrayCollection();

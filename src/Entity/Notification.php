@@ -26,7 +26,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * })
  * @ORM\MappedSuperclass()
  */
-class Notification extends AbstractEntity implements Authorable, TimeStampable, Uniqable
+abstract class Notification extends AbstractEntity implements Authorable, TimeStampable, Uniqable
 {
 	use HasUuid, HasAuthor, HasTimestamps;
 	
@@ -34,7 +34,7 @@ class Notification extends AbstractEntity implements Authorable, TimeStampable, 
 	 * NOTE : In notification context, author means the user it is generated for.
 	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="notifications")
 	 * @ORM\JoinColumn(nullable=false)
-	 * @var Authorable|User|Collection
+	 * @var Authorable|User
 	 */
 	protected $author;
 	

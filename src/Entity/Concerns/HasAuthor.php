@@ -13,7 +13,7 @@ trait HasAuthor
 	/**
 	 * @return null|Authorable|User|Collection
 	 */
-	public function getAuthor(): ?Authorable
+	public function getAuthor()
 	{
 		return $this->author;
 	}

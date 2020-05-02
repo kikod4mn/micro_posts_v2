@@ -64,20 +64,20 @@ class BlogPost extends AbstractEntity
 	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="blogPosts")
 	 * @ORM\JoinColumn(nullable=false)
 	 * @ORM\OrderBy({"createdAt" = "DESC"})
-	 * @var Authorable|User|Collection
+	 * @var Authorable|User
 	 */
 	protected $author;
 	
 	/**
 	 * @ORM\ManyToMany(targetEntity="App\Entity\Picture", mappedBy="blogPost")
 	 * @ORM\JoinColumn(nullable=false)
-	 * @var Picture|Collection
+	 * @var Picture
 	 */
 	protected $headerImage;
 	
 	/**
 	 * @ORM\OneToOne(targetEntity="App\Entity\Gallery", inversedBy="blogPost")
-	 * @var Gallery|Collection
+	 * @var Gallery
 	 */
 	protected $gallery;
 	
@@ -119,9 +119,6 @@ class BlogPost extends AbstractEntity
 	 */
 	public function __construct()
 	{
-		$this->author      = new ArrayCollection();
-		$this->headerImage = new ArrayCollection();
-		$this->gallery     = new ArrayCollection();
 		$this->comments    = new ArrayCollection();
 		$this->likedBy     = new ArrayCollection();
 		$this->reportedBy  = new ArrayCollection();

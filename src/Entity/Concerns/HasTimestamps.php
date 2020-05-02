@@ -8,20 +8,23 @@ use App\Entity\Contracts\TimeStampable;
 use Carbon\Carbon;
 use DateTime;
 use DateTimeInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 trait HasTimestamps
 {
 	/**
+	 * @Groups({"default"})
 	 * @ORM\Column(type="datetime")
 	 * @var DateTime
 	 */
-	private $createdAt;
+	protected $createdAt;
 	
 	/**
+	 * @Groups({"default"})
 	 * @ORM\Column(type="datetime", nullable=true)
 	 * @var DateTime
 	 */
-	private $updatedAt;
+	protected $updatedAt;
 	
 	/**
 	 * Set usage of timestamps on the entity.
@@ -106,21 +109,21 @@ trait HasTimestamps
 	}
 	
 	/**
+	 * Determine if the entity is using timestamps.
+	 * @return bool
+	 */
+	public function hasTimestamps(): bool
+	{
+		return $this->timestamps;
+	}
+	
+	/**
 	 * @param  DateTimeInterface  $dateTime
 	 * @return string
 	 */
 	protected function serializeDate(DateTimeInterface $dateTime): string
 	{
 		return Carbon::instance($dateTime)->toJSON();
-	}
-	
-	/**
-	 * Determine if the entity is using timestamps.
-	 * @return bool
-	 */
-	protected function hasTimestamps(): bool
-	{
-		return $this->timestamps;
 	}
 	
 	/**

@@ -47,7 +47,7 @@ class Gallery extends AbstractEntity implements Uniqable, Authorable, Publishabl
 	
 	/**
 	 * @ORM\ManyToMany(targetEntity="App\Entity\Picture", mappedBy="gallery")
-	 * @var Picture[]|Collection
+	 * @var Picture[]
 	 */
 	protected $pictures;
 	
@@ -59,15 +59,13 @@ class Gallery extends AbstractEntity implements Uniqable, Authorable, Publishabl
 	
 	/**
 	 * @ORM\OneToOne(targetEntity="App\Entity\BlogPost", mappedBy="gallery")
-	 * @var BlogPost|Collection
+	 * @var BlogPost
 	 */
 	protected $blogPost;
 	
 	public function __construct()
 	{
-		$this->author   = new ArrayCollection();
 		$this->pictures = new ArrayCollection();
-		$this->blogPost = new ArrayCollection();
 	}
 	
 	/**

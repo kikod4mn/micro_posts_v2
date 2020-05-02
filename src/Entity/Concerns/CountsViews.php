@@ -12,13 +12,13 @@ trait CountsViews
 	 * @ORM\Column(type="bigint", nullable=false)
 	 * @var int
 	 */
-	private $viewCount = 0;
+	protected $viewCount = 0;
 	
 	/**
 	 * @ORM\Column(type="bigint", nullable=false)
 	 * @var int
 	 */
-	private $weeklyViewCount = 0;
+	protected $weeklyViewCount = 0;
 	
 	/**
 	 * @return null|int

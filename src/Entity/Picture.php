@@ -45,7 +45,7 @@ class Picture extends AbstractEntity
 	 * NOTE : In notification context, author means the user it is generated for.
 	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="pictures")
 	 * @ORM\JoinColumn(nullable=false)
-	 * @var Authorable|User|Collection
+	 * @var Authorable|User
 	 */
 	protected $author;
 	
@@ -112,7 +112,6 @@ class Picture extends AbstractEntity
 	 */
 	public function __construct()
 	{
-		$this->author   = new ArrayCollection();
 		$this->blogPost = new ArrayCollection();
 		$this->gallery  = new ArrayCollection();
 	}
