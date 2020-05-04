@@ -23,7 +23,7 @@ class BlogPostFixtures extends BaseFixture implements DependentFixtureInterface
 			$blogPost->setTitle($faker->realText(60));
 			$blogPost->setBody($faker->realText(10000));
 			$blogPost->setAuthor($this->getRandomReference(User::class));
-			$blogPost->publish();
+			$blogPost->setPublishedAt(new \DateTime());
 		}
 		);
 		

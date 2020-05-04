@@ -11,10 +11,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
- * @ORM\Table(name="`micro_post_comment`")
+ * @ORM\Table(name="`micro_comment`")
  * @UniqueEntity(fields="uuid", message="How did this happen???? Uuid should be unique!!")
  * @UniqueEntity(fields="slug", message="How did this happen???? Slug should be unique!!")
- * @ORM\Entity(repositoryClass="App\Repository\MicroPostCommentRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\MicroCommentRepository")
  */
 class MicroComment extends BaseComment
 {
@@ -26,7 +26,7 @@ class MicroComment extends BaseComment
 	protected $microPost;
 	
 	/**
-	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="microComments")
+	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="microComments", fetch="EAGER")
 	 * @ORM\JoinColumn(nullable=false)
 	 * @ORM\OrderBy({"createdAt" = "DESC"})
 	 * @var Authorable|User

@@ -43,7 +43,7 @@ class Picture extends AbstractEntity
 	
 	/**
 	 * NOTE : In notification context, author means the user it is generated for.
-	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="pictures")
+	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="pictures", fetch="EAGER")
 	 * @ORM\JoinColumn(nullable=false)
 	 * @var Authorable|User
 	 */

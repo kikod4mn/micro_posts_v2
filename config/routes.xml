@@ -9,13 +9,6 @@
            methods="GET"
     />
 
-    <route id="micro_post_by_id" path="/micro-posts/{id}"
-           controller="App\Controller\MicroPostController::showId"
-           methods="GET"
-    >
-        <requirement key="id">\d+</requirement>
-    </route>
-
     <route id="micro_post_by_uuid" path="/micro-posts/{uuid}"
            controller="App\Controller\MicroPostController::showUuid"
            methods="GET"

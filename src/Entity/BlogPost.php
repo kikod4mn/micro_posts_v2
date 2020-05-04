@@ -61,7 +61,7 @@ class BlogPost extends AbstractEntity
 	protected $body;
 	
 	/**
-	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="blogPosts")
+	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="blogPosts", fetch="EAGER")
 	 * @ORM\JoinColumn(nullable=false)
 	 * @ORM\OrderBy({"createdAt" = "DESC"})
 	 * @var Authorable|User
@@ -69,7 +69,7 @@ class BlogPost extends AbstractEntity
 	protected $author;
 	
 	/**
-	 * @ORM\ManyToMany(targetEntity="App\Entity\Picture", mappedBy="blogPost")
+	 * @ORM\ManyToMany(targetEntity="App\Entity\Picture", mappedBy="blogPost", fetch="EAGER")
 	 * @ORM\JoinColumn(nullable=false)
 	 * @var Picture
 	 */

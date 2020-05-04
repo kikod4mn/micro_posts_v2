@@ -37,6 +37,12 @@ abstract class AbstractEntity implements Arrayable, Jsonable, JsonSerializable, 
 	const UPDATED_AT = 'updatedAt';
 	
 	/**
+	 * Default allowed HTML tags.
+	 * @var string
+	 */
+	const DEFAULT_HTML_TAGS = 'p,strong,i,a[href]';
+	
+	/**
 	 * @var EntityManagerInterface
 	 */
 	protected $em = null;
@@ -76,7 +82,7 @@ abstract class AbstractEntity implements Arrayable, Jsonable, JsonSerializable, 
 	/**
 	 * NOTE : Group default is always included for fields in traits that are commonly needed across entities and different ways of display.
 	 * @param  array|string[]  $groups  Normalization context groups
-	 * @param  int              $options
+	 * @param  int             $options
 	 * @return string
 	 */
 	public function toJson(array $groups = [], int $options = 0): string
@@ -187,6 +193,7 @@ abstract class AbstractEntity implements Arrayable, Jsonable, JsonSerializable, 
 	}
 	
 	/**
+	 * Return a new html purifier with configuration.
 	 * @return HTMLPurifier
 	 */
 	protected function htmlPurifier(): HTMLPurifier
@@ -204,8 +211,8 @@ abstract class AbstractEntity implements Arrayable, Jsonable, JsonSerializable, 
 	protected function allowedHtmlTags(): string
 	{
 		return defined('static::HTML_TAGS_ALLOWED')
-			? implode(',', static::HTML_TAGS_ALLOWED) . ',p,strong,i,a[href]'
-			: 'p,strong,i,a[href]';
+			? implode(',', static::HTML_TAGS_ALLOWED) . ',' . static::DEFAULT_HTML_TAGS
+			: static::DEFAULT_HTML_TAGS;
 	}
 	
 	/**

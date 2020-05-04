@@ -14,7 +14,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
  * @method MicroComment[]    findAll()
  * @method MicroComment[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class MicroPostCommentRepository extends ServiceEntityRepository
+class MicroCommentRepository extends ServiceEntityRepository
 {
 	public function __construct(ManagerRegistry $registry)
 	{

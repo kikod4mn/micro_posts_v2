@@ -1,11 +1,13 @@
 {% extends 'base/base.html.twig' %}
 
 {% block body %}
-	{{ posts }}
+	{{ posts|json_encode }}
 	
 	<hr>
 	<h2>Temporary link testing list</h2>
 	{% for post in postsPHP %}
-	
+		<p>{{ post.id }}</p>
+		<p>{{ post.author.username }}</p>
+		<a href="{{ path('micro_post_by_uuid', {'uuid': post.uuid}) }}">View with comments</a>
 	{% endfor %}
 {% endblock %}

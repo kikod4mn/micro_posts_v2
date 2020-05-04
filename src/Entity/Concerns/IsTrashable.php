@@ -14,7 +14,15 @@ trait IsTrashable
 	 * @ORM\Column(type="datetime", nullable=true)
 	 * @var DateTimeInterface
 	 */
-	private $trashedAt;
+	protected $trashedAt;
+	
+	/**
+	 * @return null|DateTimeInterface
+	 */
+	public function getTrashedAt(): ?DateTimeInterface
+	{
+		return $this->{$this->getTrashedAtColumn()};
+	}
 	
 	/**
 	 * @param  null|DateTimeInterface  $trashedAt
@@ -28,14 +36,6 @@ trait IsTrashable
 	}
 	
 	/**
-	 * @return null|DateTimeInterface
-	 */
-	public function getTrashedAt(): ?DateTimeInterface
-	{
-		return $this->{$this->getTrashedAtColumn()};
-	}
-	
-	/**
 	 * @return null|string
 	 */
 	public function getTrashedAtColumn(): ?string
@@ -45,7 +45,7 @@ trait IsTrashable
 	
 	public function isTrashed(): bool
 	{
-		return !is_null($this->{$this->getTrashedAtColumn()});
+		return ! is_null($this->{$this->getTrashedAtColumn()});
 	}
 	
 	/**
@@ -54,7 +54,7 @@ trait IsTrashable
 	 */
 	public function trash(): Trashable
 	{
-		$this->setTrashedAt(new DateTime());
+		$this->setTrashedAt($this->freshTimestamp());
 		
 		$this->em->flush();
 		
@@ -78,7 +78,7 @@ trait IsTrashable
 	 */
 	public function destroy(): void
 	{
-		if (!$this->isTrashed()) {
+		if (! $this->isTrashed()) {
 			// If this entity is not yet soft deleted, return without modification.
 			return;
 		}

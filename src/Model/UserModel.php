@@ -6,12 +6,12 @@ namespace App\Model;
 
 use App\Model\Abstracts\AbstractModel;
 use App\Model\Concerns\DecodesUuid;
-use App\Model\Concerns\WorksWithUuid;
+use App\Model\Concerns\FindsUuids;
 use App\Repository\UserRepository;
 
 class UserModel extends AbstractModel
 {
-	use DecodesUuid, WorksWithUuid;
+	use DecodesUuid, FindsUuids;
 	
 	/**
 	 * UserModel constructor.

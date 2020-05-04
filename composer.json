@@ -9,7 +9,6 @@
         "ext-mbstring": "*",
         "crudleapps/profanity": "^1.0",
         "ezyang/htmlpurifier": "^4.12",
-        "knplabs/knp-paginator-bundle": "^5.1",
         "nesbot/carbon": "^2.32",
         "php-http/curl-client": "^2.1",
         "ramsey/uuid": "^4.0",

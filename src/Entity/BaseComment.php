@@ -14,6 +14,7 @@ use App\Entity\Concerns\HasSlug;
 use App\Entity\Concerns\HasTimestamps;
 use App\Entity\Concerns\IsPublishable;
 use App\Entity\Concerns\HasUuid;
+use App\Entity\Concerns\IsTrashable;
 use App\Entity\Contracts\Authorable;
 use App\Entity\Contracts\CountableLikes;
 use App\Entity\Contracts\CountableViews;
@@ -21,6 +22,7 @@ use App\Entity\Contracts\Publishable;
 use App\Entity\Contracts\Reportable;
 use App\Entity\Contracts\Sluggable;
 use App\Entity\Contracts\TimeStampable;
+use App\Entity\Contracts\Trashable;
 use App\Entity\Contracts\Uniqable;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -34,9 +36,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\MappedSuperclass()
  */
 abstract class BaseComment extends AbstractEntity
-	implements CountableViews, CountableLikes, Authorable, TimeStampable, Publishable, Reportable, Uniqable, Sluggable
+	implements CountableViews, CountableLikes, Authorable, TimeStampable, Publishable, Reportable, Uniqable, Sluggable, Trashable
 {
-	use HasUuid, CountsLikes, CountsViews, HasAuthor, HasTimestamps, IsPublishable, IsReportable, HasSlug, IsLikable;
+	use HasUuid, CountsLikes, CountsViews, HasAuthor, HasTimestamps, IsPublishable, IsReportable, HasSlug, IsLikable, IsTrashable;
 	
 	/**
 	 * @var string

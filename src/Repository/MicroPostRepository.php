@@ -16,7 +16,6 @@ use Doctrine\Common\Persistence\ManagerRegistry;
  */
 class MicroPostRepository extends ServiceEntityRepository
 {
-	
 	/**
 	 * PostRepository constructor.
 	 * @param  ManagerRegistry  $registry

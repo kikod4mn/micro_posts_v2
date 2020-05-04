@@ -11,10 +11,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
- * @ORM\Table(name="`blog_post_comment`")
+ * @ORM\Table(name="`blog_comment`")
  * @UniqueEntity(fields="uuid", message="How did this happen???? Uuid should be unique!!")
  * @UniqueEntity(fields="slug", message="How did this happen???? Slug should be unique!!")
- * @ORM\Entity(repositoryClass="App\Repository\BlogPostCommentRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\BlogCommentRepository")
  */
 class BlogComment extends BaseComment
 {
@@ -27,7 +27,7 @@ class BlogComment extends BaseComment
 	protected $blogPost;
 	
 	/**
-	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="blogComments")
+	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="blogComments", fetch="EAGER")
 	 * @ORM\JoinColumn(nullable=false)
 	 * @ORM\OrderBy({"createdAt" = "DESC"})
 	 * @var Authorable|User

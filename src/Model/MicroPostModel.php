@@ -6,31 +6,34 @@ namespace App\Model;
 
 use App\Model\Abstracts\AbstractModel;
 use App\Model\Concerns\DecodesUuid;
-use App\Model\Concerns\FindsBySlug;
-use App\Model\Concerns\WorksWithUuid;
+use App\Model\Concerns\FindsSlugs;
+use App\Model\Concerns\Paginates;
+use App\Model\Concerns\FindsUuids;
+use App\Model\Contracts\Filterable;
+use App\Model\Contracts\Paginatable;
 use App\Repository\MicroPostRepository;
+use App\Support\Contracts\FilterInterface;
 
-class MicroPostModel extends AbstractModel
+class MicroPostModel extends AbstractModel implements Filterable, Paginatable
 {
-	use WorksWithUuid, DecodesUuid, FindsBySlug;
-	
-	protected $filters = ['publishable:published', 'trashable:trashed'];
+	use FindsUuids, DecodesUuid, FindsSlugs, Paginates;
 	
 	/**
 	 * MicroPostModel constructor.
 	 * @param  MicroPostRepository  $repository
+	 * @param  FilterInterface      $filter
 	 */
-	public function __construct(MicroPostRepository $repository)
+	public function __construct(MicroPostRepository $repository, FilterInterface $filter)
 	{
-		parent::__construct($repository);
+		parent::__construct($repository, $filter);
 	}
 	
 	/**
-	 * @param  array|string[]  $groups
 	 * @return string|array
 	 */
-	public function findForIndex(array $groups = [])
+	public function findForIndex()
 	{
-		return $this->result($this->findBy([], ['createdAt' => 'DESC'], 10))->filters()->return();
+		return $this->findBy([], [], 10);
 	}
+	
 }

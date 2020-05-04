@@ -59,7 +59,7 @@ class MicroPost extends AbstractEntity
 	 * @Groups(
 	 *     {"default", "post-list", "post-with-comments"}
 	 *     )
-	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="microPosts")
+	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="microPosts", fetch="EAGER")
 	 * @ORM\JoinColumn(nullable=false)
 	 * @ORM\OrderBy({"createdAt" = "DESC"})
 	 * @var Authorable|User

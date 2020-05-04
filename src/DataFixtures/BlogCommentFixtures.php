@@ -24,7 +24,7 @@ class BlogCommentFixtures extends BaseFixture implements DependentFixtureInterfa
 			$blogComment->setBody($faker->realText(240));
 			$blogComment->setAuthor($this->getRandomReference(User::class));
 			$blogComment->setBlogPost($this->getRandomReference(BlogPost::class));
-			$blogComment->publish();
+			$blogComment->setPublishedAt(new \DateTime());
 		}
 		);
 		

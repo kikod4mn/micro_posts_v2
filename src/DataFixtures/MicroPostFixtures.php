@@ -22,7 +22,7 @@ class MicroPostFixtures extends BaseFixture implements DependentFixtureInterface
 			MicroPost::class, 250, function (MicroPost $microPost, $i) use ($faker) {
 			$microPost->setBody($faker->realText(240));
 			$microPost->setAuthor($this->getRandomReference(User::class));
-			$microPost->publish();
+			$microPost->setPublishedAt(new \DateTime());
 		}
 		);
 		

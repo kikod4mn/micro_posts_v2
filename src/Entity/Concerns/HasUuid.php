@@ -12,7 +12,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 trait HasUuid
 {
 	/**
-	 * @Groups({"default"})
 	 * @ORM\Id()
 	 * @ORM\Column(type="bigint", options={"unsigned": true})
 	 * @ORM\GeneratedValue()

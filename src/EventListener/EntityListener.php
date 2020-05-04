@@ -97,10 +97,11 @@ class EntityListener
 		// Set the entity manager.
 		$entity->setEntityManager($args->getEntityManager());
 		
-		// If entity implements statistics gathering, for instance view counts, increment the counters.
-		if ($entity instanceof CountableViews) {
-			
-			$entity->incrementViewCounters();
-		}
+		// todo figure something better. This adds 200 ms on only 10 entites
+		//		// If entity implements statistics gathering, for instance view counts, increment the counters.
+		//		if ($entity instanceof CountableViews) {
+		//
+		//			$entity->incrementViewCounters();
+		//		}
 	}
 }

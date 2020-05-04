@@ -24,7 +24,7 @@ class MicroCommentFixtures extends BaseFixture implements DependentFixtureInterf
 			$microComment->setBody($faker->realText(240));
 			$microComment->setAuthor($this->getRandomReference(User::class));
 			$microComment->setMicroPost($this->getRandomReference(MicroPost::class));
-			$microComment->publish();
+			$microComment->setPublishedAt(new \DateTime());
 		}
 		);
 		

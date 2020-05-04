@@ -12,13 +12,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 trait IsPublishable
 {
 	/**
-	 * @ORM\Column(type="boolean", nullable=false)
-	 * @var bool
-	 */
-	protected $published = false;
-	
-	/**
-	 * @Groups({"default"})
 	 * @ORM\Column(type="datetime", nullable=true)
 	 * @var DateTime
 	 */
@@ -29,7 +22,34 @@ trait IsPublishable
 	 */
 	public function isPublished(): ?bool
 	{
-		return $this->published;
+		return ! is_null($this->{$this->getPublishedAtColumn()});
+	}
+	
+	/**
+	 * @return null|DateTimeInterface
+	 */
+	public function getPublishedAt(): ?DateTimeInterface
+	{
+		return $this->{$this->getPublishedAtColumn()}();
+	}
+	
+	/**
+	 * @param  null|DateTimeInterface  $publishedAt
+	 * @return $this|Publishable
+	 */
+	public function setPublishedAt(?DateTimeInterface $publishedAt): Publishable
+	{
+		$this->{$this->getPublishedAtColumn()} = $publishedAt;
+		
+		return $this;
+	}
+	
+	/**
+	 * @return null|string
+	 */
+	public function getPublishedAtColumn(): ?string
+	{
+		return defined('static::PUBLISHED_AT') ? static::PUBLISHED_AT : 'publishedAt';
 	}
 	
 	/**
@@ -38,7 +58,9 @@ trait IsPublishable
 	 */
 	public function publish(): Publishable
 	{
-		$this->published = true;
+		$this->setPublishedAt($this->freshTimestamp());
+		
+		$this->em->flush();
 		
 		return $this;
 	}
@@ -49,27 +71,10 @@ trait IsPublishable
 	 */
 	public function unPublish(): Publishable
 	{
-		$this->published = false;
+		$this->setPublishedAt(null);
+		
+		$this->em->flush();
 		
 		return $this;
-	}
-	
-	/**
-	 * @param  DateTimeInterface  $publishedAt
-	 * @return $this|Publishable
-	 */
-	public function setPublishedAt(DateTimeInterface $publishedAt): Publishable
-	{
-		$this->publishedAt = $publishedAt;
-		
-		return $this;
-	}
-	
-	/**
-	 * @return null|DateTimeInterface
-	 */
-	public function getPublishedAt(): ?DateTimeInterface
-	{
-		return $this->publishedAt;
 	}
 }

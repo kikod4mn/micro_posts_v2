@@ -4,8 +4,12 @@ declare(strict_types = 1);
 
 namespace App\Controller;
 
+use App\Entity\ContentCount;
 use App\Entity\MicroPost;
 use App\Model\MicroPostModel;
+use App\Repository\ContentCountsRepository;
+use App\Repository\MicroPostRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,12 +22,33 @@ class MicroPostController extends AbstractController
 	private $model;
 	
 	/**
-	 * MicroPostController constructor.
-	 * @param  MicroPostModel  $model
+	 * @var MicroPostRepository
 	 */
-	public function __construct(MicroPostModel $model)
+	private $repository;
+	
+	/**
+	 * @var ContentCount
+	 */
+	private $counts;
+	
+	/**
+	 * @var EntityManagerInterface
+	 */
+	private $entityManager;
+	
+	/**
+	 * MicroPostController constructor.
+	 * @param  MicroPostModel           $model
+	 * @param  MicroPostRepository      $repository
+	 * @param  ContentCountsRepository  $counts
+	 * @param  EntityManagerInterface   $entityManager
+	 */
+	public function __construct(MicroPostModel $model, MicroPostRepository $repository, ContentCountsRepository $counts, EntityManagerInterface $entityManager)
 	{
-		$this->model = $model;
+		$this->model         = $model;
+		$this->repository    = $repository;
+		$this->counts        = $counts;
+		$this->entityManager = $entityManager;
 	}
 	
 	/**
@@ -35,7 +60,11 @@ class MicroPostController extends AbstractController
 		return $this->render(
 			'micro_posts/index.html.twig',
 			[
-				'posts' => $this->model->groups(['post-list'])->asJson()->findForIndex(),
+				//				'posts' => $this->repository->findBy([], ['id' => 'asc'], 15),
+				//				'postsPHP' => $this->repository->findBy([], ['id' => 'desc'], 10)
+				'postsPHP' => $this->model->groups(['post-list'])->findBy(['id' => [12, 11, 10, 23, 1, 41, 3]], [], 10),
+				'posts'    => $this->model->groups(['post-list'])->asJson()->findForIndex(),
+				//				'posts'    => ($this->model->getFreshInstance())->groups(['post-list'])->asJson()->findForIndex(),
 			]
 		);
 	}
@@ -56,16 +85,7 @@ class MicroPostController extends AbstractController
 	{
 		$microPost = new MicroPost();
 		
-		return $this->redirectToRoute('micro_post_by_slug', ['slug' => $microPost->getSlug()]);
-	}
-	
-	/**
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function showId(int $id): Response
-	{
-		return $this->render('micro_posts/show.html.twig', ['post' => $this->model->findOrFail($id)->toJson(['post-with-comments'])]);
+		return $this->redirectToRoute('micro_post_by_uuid', ['uuid' => $microPost->getUuid()]);
 	}
 	
 	/**
@@ -74,7 +94,12 @@ class MicroPostController extends AbstractController
 	 */
 	public function showUuid(string $uuid): Response
 	{
-		return $this->render('micro_posts/show.html.twig', ['post' => $this->model->findOrFailUuid($uuid)->toJson(['post-with-comments'])]);
+		return $this->render(
+			'micro_posts/show.html.twig',
+			[
+				'post' => $this->model->asJson()->groups(['post-with-comments'])->find($id),
+			]
+		);
 	}
 	
 	/**
@@ -83,7 +108,12 @@ class MicroPostController extends AbstractController
 	 */
 	public function showSlug(string $slug): Response
 	{
-		return $this->render('micro_posts/show.html.twig', ['post' => $this->model->findOrFailSlug($slug)->toJson(['post-with-comments'])]);
+		return $this->render(
+			'micro_posts/show.html.twig',
+			[
+				'post' => $this->model->asJson()->groups(['post-with-comments'])->find($id),
+			]
+		);
 	}
 	
 	/**

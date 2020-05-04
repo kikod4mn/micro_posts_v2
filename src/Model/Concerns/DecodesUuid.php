@@ -24,7 +24,7 @@ trait DecodesUuid
 			$this->init();
 		}
 		
-		return $this->uuidEncoder->decode($encoded);
+		return $this->uuidEncoder->decode($encoded)->toString();
 	}
 	
 	/**

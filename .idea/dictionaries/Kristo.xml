@@ -4,7 +4,9 @@
       <w>arrayable</w>
       <w>authorable</w>
       <w>fullname</w>
+      <w>htmlable</w>
       <w>jsonable</w>
+      <w>paginatable</w>
       <w>pluralizer</w>
       <w>rememberme</w>
       <w>sluggable</w>
