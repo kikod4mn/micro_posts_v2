@@ -8,7 +8,6 @@ use App\Entity\ContentCount;
 use App\Entity\MicroPost;
 use App\Model\MicroPostModel;
 use App\Repository\ContentCountsRepository;
-use App\Repository\MicroPostRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,11 +19,6 @@ class MicroPostController extends AbstractController
 	 * @var MicroPostModel
 	 */
 	private $model;
-	
-	/**
-	 * @var MicroPostRepository
-	 */
-	private $repository;
 	
 	/**
 	 * @var ContentCount
@@ -39,14 +33,12 @@ class MicroPostController extends AbstractController
 	/**
 	 * MicroPostController constructor.
 	 * @param  MicroPostModel           $model
-	 * @param  MicroPostRepository      $repository
 	 * @param  ContentCountsRepository  $counts
 	 * @param  EntityManagerInterface   $entityManager
 	 */
-	public function __construct(MicroPostModel $model, MicroPostRepository $repository, ContentCountsRepository $counts, EntityManagerInterface $entityManager)
+	public function __construct(MicroPostModel $model, ContentCountsRepository $counts, EntityManagerInterface $entityManager)
 	{
 		$this->model         = $model;
-		$this->repository    = $repository;
 		$this->counts        = $counts;
 		$this->entityManager = $entityManager;
 	}
@@ -92,12 +84,12 @@ class MicroPostController extends AbstractController
 	 * @param  string  $uuid
 	 * @return Response
 	 */
-	public function showUuid(string $uuid): Response
+	public function show(string $uuid): Response
 	{
 		return $this->render(
 			'micro_posts/show.html.twig',
 			[
-				'post' => $this->model->asJson()->groups(['post-with-comments'])->find($id),
+				'post' => $this->model->asJson()->groups(['post-with-comments'])->findUuid($uuid),
 			]
 		);
 	}
@@ -111,7 +103,7 @@ class MicroPostController extends AbstractController
 		return $this->render(
 			'micro_posts/show.html.twig',
 			[
-				'post' => $this->model->asJson()->groups(['post-with-comments'])->find($id),
+				'post' => $this->model->asJson()->groups(['post-with-comments'])->findSlug($slug),
 			]
 		);
 	}
@@ -132,7 +124,7 @@ class MicroPostController extends AbstractController
 	 */
 	public function update(Request $request, string $id): Response
 	{
-		$microPost = $this->model->findOrFailUuid($id);
+		$microPost = $this->model->findUuid($id);
 		
 		return $this->redirectToRoute('micro_post_by_slug', ['slug' => $microPost->getSlug()]);
 	}

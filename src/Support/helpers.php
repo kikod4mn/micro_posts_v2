@@ -7,10 +7,26 @@ declare(strict_types = 1);
  * Laravel - A PHP Framework For Web Artisans
  * @package  Laravel
  * @author   Taylor Otwell <taylor@laravel.com>
+ * @author   Kristo Leas <kristo@kikopolis.tech>
  */
 
 use App\Support\Arr;
 use Doctrine\Common\Collections\Collection;
+
+if (! function_exists('escape')) {
+	function escape($var): string
+	{
+		if (! (string) $var) {
+			throw new InvalidArgumentException('Unable to process variable to string and escape.');
+		}
+		
+		return htmlspecialchars(
+			escapeshellarg(
+				escapeshellcmd($var)
+			)
+		);
+	}
+}
 
 if (! function_exists('data_get')) {
 	/**

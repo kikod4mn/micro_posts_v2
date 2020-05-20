@@ -8,6 +8,7 @@ use App\Model\Abstracts\AbstractModel;
 use App\Model\Concerns\DecodesUuid;
 use App\Model\Concerns\FindsUuids;
 use App\Repository\UserRepository;
+use App\Support\Contracts\FilterInterface;
 
 class UserModel extends AbstractModel
 {
@@ -15,10 +16,11 @@ class UserModel extends AbstractModel
 	
 	/**
 	 * UserModel constructor.
-	 * @param  UserRepository  $repository
+	 * @param  UserRepository   $repository
+	 * @param  FilterInterface  $filter
 	 */
-	public function __construct(UserRepository $repository)
+	public function __construct(UserRepository $repository, FilterInterface $filter)
 	{
-		parent::__construct($repository);
+		parent::__construct($repository, $filter);
 	}
 }
